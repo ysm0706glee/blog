@@ -13,5 +13,9 @@
     "@nuxt/devtools": "latest",
     "@nuxtjs/supabase": "^1.1.0",
     "nuxt": "^3.7.3"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^2.8.1",
+    "zod": "^3.22.2"
   }
 }
