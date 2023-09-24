@@ -5,8 +5,8 @@ export const blogSchema = z.object({
   url: z.string(),
   title: z.string(),
   description: z.string(),
-  picture: z.string().optional(),
-  created_at: z.date(),
+  image: z.string().nullable(),
+  created_at: z.string(),
 });
 
 export type Blog = z.infer<typeof blogSchema>;
