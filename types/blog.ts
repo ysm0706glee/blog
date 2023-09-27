@@ -5,7 +5,7 @@ export const blogSchema = z.object({
   url: z.string(),
   title: z.string(),
   description: z.string(),
-  image: z.string().nullable(),
+  image: z.string(),
   created_at: z.string(),
 });
 
