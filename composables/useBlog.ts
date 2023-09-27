@@ -28,9 +28,6 @@ const useBlog = () => {
         image: blog.image,
       })
       .select();
-
-    console.log("newBlog: ", newBlog);
-
     if (error) {
       console.error(error);
       return null;
