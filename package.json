@@ -13,10 +13,13 @@
     "@nuxt/devtools": "latest",
     "@nuxtjs/supabase": "^1.1.0",
     "cheerio": "^1.0.0-rc.12",
-    "nuxt": "^3.7.3"
+    "nuxt": "^3.7.3",
+    "vue3-toastify": "^0.1.13"
   },
   "dependencies": {
     "@nuxt/ui": "^2.8.1",
+    "@vee-validate/zod": "^4.11.7",
+    "vee-validate": "^4.11.7",
     "zod": "^3.22.2"
   }
 }
