@@ -5,4 +5,7 @@ export default defineNuxtConfig({
   supabase: {
     redirect: false,
   },
+  build: {
+    transpile: ["trpc-nuxt"],
+  },
 });
