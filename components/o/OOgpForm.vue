@@ -4,6 +4,8 @@ import { toTypedSchema } from "@vee-validate/zod";
 import * as zod from "zod";
 import { Blog } from "~/types/blog";
 
+const { $client } = useNuxtApp();
+
 type Emits = {
   (emit: "after-getting-ogp"): void;
   (
@@ -32,12 +34,15 @@ const { value: url } = useField<string>("url");
 
 const onGetOgp = handleSubmit(async ({ url }) => {
   if (!url.length) return;
-  const response = await $fetch("/api/ogp", {
-    method: "POST",
-    body: { url },
+  const ogp = await $client.ogpRouter.getOgp.useQuery({
+    url: "https://trpc.io/docs/quickstart",
   });
+  if (!ogp.data.value) {
+    useNuxtApp().$toast.error("error");
+    return;
+  }
   emits("after-getting-ogp");
-  emits("set-blog-data", url, response);
+  emits("set-blog-data", url, ogp.data.value);
 });
 
 watch(url, (newUrl) => {
@@ -52,7 +57,7 @@ watch(url, (newUrl) => {
 </script>
 
 <template>
-  <form @submit="onGetOgp">
+  <form @submit.prevent="onGetOgp">
     <div>
       <label for="url">A blog url</label>
       <UInput id="url" v-model="url" name="url" />
