@@ -1,46 +1,78 @@
 <script setup lang="ts">
 import { useInfiniteScroll } from "@vueuse/core";
+import { Tag } from "~/types/tag";
 
-const { blogsState, offset, limit, getBlogs } = useBlog();
+const {
+  blogsState,
+  isFetching,
+  hasMoreData,
+  getBlogsWithInfiniteScroll,
+  getBlogsWithInfiniteScrollByTags,
+} = inject(blogInjectionKey)!;
+
+// TODO: ! is not safe
+const { tagState, selectedTags } = inject(tagInjectionKey)!;
+
+type Emits = {
+  (emit: "on-get-blogs-with-infinite-by-tags", tags: Tag[]): void;
+};
+
+const emits = defineEmits<Emits>();
 
 const scrollContainerRef = ref<HTMLElement | null>(null);
-const isFetching = ref(false);
-const hasMoreData = ref(true);
 
-const loadMoreBlogs = async () => {
-  if (!hasMoreData.value) return;
-  isFetching.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  const newBlogs = await getBlogs(offset.value, limit);
-  if (newBlogs?.length) {
-    offset.value += limit;
+const isFilteringByTags = computed(() => selectedTags.value.length > 0);
+
+const toggleTag = (tagId: Tag["id"]) => {
+  const tag = tagState.value.find((tag) => tag.id === tagId);
+  if (!tag) return;
+  if (selectedTags.value.some((selectedTag) => selectedTag.id === tagId)) {
+    selectedTags.value = selectedTags.value.filter(
+      (selectedTag) => selectedTag.id !== tagId
+    );
   } else {
-    hasMoreData.value = false;
+    selectedTags.value = [tag, ...selectedTags.value];
   }
-  isFetching.value = false;
+  onGetBlogsWithInfiniteScrollByTags(selectedTags.value);
+};
+
+const onGetBlogsWithInfiniteScrollByTags = (tags: Tag[]) => {
+  emits("on-get-blogs-with-infinite-by-tags", tags);
 };
 
 useInfiniteScroll(
   scrollContainerRef,
   async () => {
-    if (hasMoreData.value) {
-      await loadMoreBlogs();
+    if (hasMoreData.value && !isFetching.value) {
+      isFilteringByTags.value
+        ? await getBlogsWithInfiniteScrollByTags(selectedTags.value)
+        : await getBlogsWithInfiniteScroll();
     }
   },
   {
-    distance: 10,
+    distance: 100,
   }
 );
-
-try {
-  await loadMoreBlogs();
-} catch (error) {
-  console.error(error);
-}
 </script>
 
 <template>
-  <div>
+  <div class="h-screen">
+    <div>
+      <template v-if="tagState.length">
+        <UBadge
+          v-for="tag in tagState"
+          :key="tag.id"
+          :label="tag.name"
+          :color="
+            selectedTags.some((selectedTag) => selectedTag.id === tag.id)
+              ? 'primary'
+              : 'gray'
+          "
+          class="cursor-pointer"
+          @click="toggleTag(tag.id)"
+        />
+      </template>
+    </div>
     <ul class="h-full overflow-y-scroll" ref="scrollContainerRef">
       <li
         v-for="blog in blogsState"
