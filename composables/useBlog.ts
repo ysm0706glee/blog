@@ -6,8 +6,8 @@ export const useBlog = () => {
   const supabase = useSupabaseClient<Database>();
 
   const blogsState = ref<Blog[]>([]);
-  const offset = ref(0);
-  const limit = ref(10);
+  const offsetState = ref(0);
+  const limitState = ref(10);
   const isFetching = ref(false);
   const hasMoreData = ref(true);
 
@@ -27,6 +27,7 @@ export const useBlog = () => {
       .from("blogs")
       .select("*")
       .range(offset, offset + limit - 1);
+    offsetState.value += limitState.value;
     if (error) {
       console.error(error);
       return null;
@@ -39,10 +40,8 @@ export const useBlog = () => {
     if (!hasMoreData.value) return;
     setIsFetching(true);
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    const blogs = await getBlogs(offset.value, limit.value);
-    if (blogs?.length) {
-      offset.value += limit.value;
-    } else {
+    const blogs = await getBlogs(offsetState.value, limitState.value);
+    if (!blogs?.length) {
       setHasMoreData(false);
     }
     setIsFetching(false);
@@ -61,7 +60,7 @@ export const useBlog = () => {
         tags.map((tag) => tag.id)
       )
       .range(offset, offset + limit - 1);
-    console.log(data);
+    offsetState.value += limitState.value;
     if (error) {
       console.error(error);
       return null;
@@ -74,10 +73,12 @@ export const useBlog = () => {
     if (!hasMoreData.value) return;
     setIsFetching(true);
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    const blogs = await getBlogsByTags(tags, offset.value, limit.value);
-    if (blogs?.length) {
-      offset.value += limit.value;
-    } else {
+    const blogs = await getBlogsByTags(
+      tags,
+      offsetState.value,
+      limitState.value
+    );
+    if (!blogs?.length) {
       setHasMoreData(false);
     }
     setIsFetching(false);
@@ -125,8 +126,8 @@ export const useBlog = () => {
 
   return {
     blogsState,
-    offset,
-    limit,
+    offsetState,
+    limitState,
     isFetching,
     hasMoreData,
     setIsFetching,

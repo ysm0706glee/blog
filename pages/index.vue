@@ -10,18 +10,20 @@ provide(blogInjectionKey, _useBlog);
 
 provide(tagInjectionKey, _useTag);
 
-const { blogsState, offset, getBlogsWithInfiniteScrollByTags } = _useBlog;
+const { blogsState, offsetState, limitState, getBlogs, getBlogsByTags } =
+  _useBlog;
 
 const { getTags } = _useTag;
 
 const onGetBlogsWithInfiniteByTags = async (tags: Tag[]) => {
   blogsState.value = [];
-  offset.value = 0;
-  await getBlogsWithInfiniteScrollByTags(tags);
+  offsetState.value = 0;
+  await getBlogsByTags(tags, offsetState.value, limitState.value);
 };
 
 try {
   await getTags();
+  await getBlogs(offsetState.value, limitState.value);
 } catch (error) {
   console.error(error);
 }
