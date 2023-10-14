@@ -102,7 +102,7 @@ export const useBlog = () => {
 
   const postBlog = async (
     blog: Pick<Blog, "url" | "title" | "description" | "image">,
-    tags?: Tag[]
+    tags: Tag[]
   ): Promise<Blog | null> => {
     const { data, error } = await supabase.from("blogs").insert(blog).select();
     if (error) {
@@ -110,7 +110,7 @@ export const useBlog = () => {
       return null;
     }
     const newBlog = data[0];
-    if (tags?.length) {
+    if (tags.length) {
       const success = await postBlogTags(newBlog.id, tags);
       if (!success) {
         console.error(
