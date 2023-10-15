@@ -3,7 +3,6 @@ import { useField, useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as zod from "zod";
 import { Blog } from "~/types/blog";
-import { Tag } from "~/types/tag";
 import { tagInjectionKey } from "~/composables/useTag";
 
 type Props = {
@@ -12,10 +11,10 @@ type Props = {
 
 const props = defineProps<Props>();
 
-const { postBlog } = useBlog();
+const { postBlog } = inject(blogInjectionKey)!;
 
 // TODO: ! is not safe
-const { tagState, selectedTags, getTags } = inject(tagInjectionKey)!;
+const { tagState, selectedTags, toggleTag } = inject(tagInjectionKey)!;
 
 const validationSchema = toTypedSchema(
   zod.object({
@@ -69,28 +68,9 @@ const onPost = handleSubmit(async ({ url, title, description, image }) => {
     : useNuxtApp().$toast.error("error");
 });
 
-const toggleTag = (tagId: Tag["id"]) => {
-  const tag = tagState.value.find((tag) => tag.id === tagId);
-  if (!tag) return;
-  if (selectedTags.value.some((selectedTag) => selectedTag.id === tagId)) {
-    selectedTags.value = selectedTags.value.filter(
-      (selectedTag) => selectedTag.id !== tagId
-    );
-  } else {
-    selectedTags.value = [tag, ...selectedTags.value];
-  }
-};
-
 const openAddTagModal = () => {
   isOpenAddTagModal.value = true;
 };
-
-try {
-  await getTags();
-} catch (error) {
-  console.error(error);
-  useNuxtApp().$toast.error("error");
-}
 </script>
 
 <template>
@@ -113,18 +93,7 @@ try {
     <div>
       <label for="image">Tags</label>
       <template v-if="tagState.length">
-        <UBadge
-          v-for="tag in tagState"
-          :key="tag.id"
-          :label="tag.name"
-          :color="
-            selectedTags.some((selectedTag) => selectedTag.id === tag.id)
-              ? 'primary'
-              : 'gray'
-          "
-          class="cursor-pointer"
-          @click="toggleTag(tag.id)"
-        />
+        <OTagList @on-toggle-tag="toggleTag" />
       </template>
       <div>
         <UButton label="Open" @click="openAddTagModal" />
