@@ -7,6 +7,18 @@ export const useTag = () => {
   const tagState = ref<Tag[]>([]);
   const selectedTags = ref<Tag[]>([]);
 
+  const toggleTag = (tagId: Tag["id"]) => {
+    const tag = tagState.value.find((tag) => tag.id === tagId);
+    if (!tag) return;
+    if (selectedTags.value.some((selectedTag) => selectedTag.id === tagId)) {
+      selectedTags.value = selectedTags.value.filter(
+        (selectedTag) => selectedTag.id !== tagId
+      );
+    } else {
+      selectedTags.value = [tag, ...selectedTags.value];
+    }
+  };
+
   const getTags = async (): Promise<Tag[] | null> => {
     const { data: tags, error } = await supabase.from("tags").select("*");
     if (error) {
@@ -33,6 +45,7 @@ export const useTag = () => {
   return {
     tagState,
     selectedTags,
+    toggleTag,
     getTags,
     postTag,
   };

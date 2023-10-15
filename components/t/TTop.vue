@@ -11,7 +11,7 @@ const {
 } = inject(blogInjectionKey)!;
 
 // TODO: ! is not safe
-const { tagState, selectedTags } = inject(tagInjectionKey)!;
+const { tagState, selectedTags, toggleTag } = inject(tagInjectionKey)!;
 
 type Emits = {
   (emit: "on-get-blogs-with-infinite-by-tags", tags: Tag[]): void;
@@ -23,21 +23,9 @@ const scrollContainerRef = ref<HTMLElement | null>(null);
 
 const isFilteringByTags = computed(() => selectedTags.value.length > 0);
 
-const toggleTag = (tagId: Tag["id"]) => {
-  const tag = tagState.value.find((tag) => tag.id === tagId);
-  if (!tag) return;
-  if (selectedTags.value.some((selectedTag) => selectedTag.id === tagId)) {
-    selectedTags.value = selectedTags.value.filter(
-      (selectedTag) => selectedTag.id !== tagId
-    );
-  } else {
-    selectedTags.value = [tag, ...selectedTags.value];
-  }
-  onGetBlogsWithInfiniteScrollByTags(selectedTags.value);
-};
-
-const onGetBlogsWithInfiniteScrollByTags = (tags: Tag[]) => {
-  emits("on-get-blogs-with-infinite-by-tags", tags);
+const onToggleTag = (tagId: Tag["id"]) => {
+  toggleTag(tagId);
+  emits("on-get-blogs-with-infinite-by-tags", selectedTags.value);
 };
 
 useInfiniteScroll(
@@ -59,18 +47,7 @@ useInfiniteScroll(
   <div class="h-screen">
     <div>
       <template v-if="tagState.length">
-        <UBadge
-          v-for="tag in tagState"
-          :key="tag.id"
-          :label="tag.name"
-          :color="
-            selectedTags.some((selectedTag) => selectedTag.id === tag.id)
-              ? 'primary'
-              : 'gray'
-          "
-          class="cursor-pointer"
-          @click="toggleTag(tag.id)"
-        />
+        <OTagList @on-toggle-tag="onToggleTag" />
       </template>
     </div>
     <ul class="h-full overflow-y-scroll" ref="scrollContainerRef">
