@@ -1,46 +1,55 @@
 <script setup lang="ts">
 import { useInfiniteScroll } from "@vueuse/core";
+import { Tag } from "~/types/tag";
 
-const { blogsState, offset, limit, getBlogs } = useBlog();
+const {
+  blogsState,
+  isFetching,
+  hasMoreData,
+  getBlogsWithInfiniteScroll,
+  getBlogsWithInfiniteScrollByTags,
+} = inject(blogInjectionKey)!;
+
+// TODO: ! is not safe
+const { tagState, selectedTags, toggleTag } = inject(tagInjectionKey)!;
+
+type Emits = {
+  (emit: "on-get-blogs-with-infinite-by-tags", tags: Tag[]): void;
+};
+
+const emits = defineEmits<Emits>();
 
 const scrollContainerRef = ref<HTMLElement | null>(null);
-const isFetching = ref(false);
-const hasMoreData = ref(true);
 
-const loadMoreBlogs = async () => {
-  if (!hasMoreData.value) return;
-  isFetching.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  const newBlogs = await getBlogs(offset.value, limit);
-  if (newBlogs?.length) {
-    offset.value += limit;
-  } else {
-    hasMoreData.value = false;
-  }
-  isFetching.value = false;
+const isFilteringByTags = computed(() => selectedTags.value.length > 0);
+
+const onToggleTag = (tagId: Tag["id"]) => {
+  toggleTag(tagId);
+  emits("on-get-blogs-with-infinite-by-tags", selectedTags.value);
 };
 
 useInfiniteScroll(
   scrollContainerRef,
   async () => {
-    if (hasMoreData.value) {
-      await loadMoreBlogs();
+    if (hasMoreData.value && !isFetching.value) {
+      isFilteringByTags.value
+        ? await getBlogsWithInfiniteScrollByTags(selectedTags.value)
+        : await getBlogsWithInfiniteScroll();
     }
   },
   {
-    distance: 10,
+    distance: 100,
   }
 );
-
-try {
-  await loadMoreBlogs();
-} catch (error) {
-  console.error(error);
-}
 </script>
 
 <template>
-  <div>
+  <div class="h-screen">
+    <div>
+      <template v-if="tagState.length">
+        <OTagList @on-toggle-tag="onToggleTag" />
+      </template>
+    </div>
     <ul class="h-full overflow-y-scroll" ref="scrollContainerRef">
       <li
         v-for="blog in blogsState"

@@ -35,7 +35,7 @@ const { value: url } = useField<string>("url");
 const onGetOgp = handleSubmit(async ({ url }) => {
   if (!url.length) return;
   const ogp = await $client.ogpRouter.getOgp.useQuery({
-    url: "https://trpc.io/docs/quickstart",
+    url,
   });
   if (!ogp.data.value) {
     useNuxtApp().$toast.error("error");
