@@ -6,3 +6,7 @@ account_id = ""
 
 [site]
 bucket = ".output/public"
+
+[vars]
+SUPABASE_URL = ""
+SUPABASE_KEY = ""
