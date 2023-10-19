@@ -1,32 +1,15 @@
-name: Cloudflare
-
 on:
   push:
     branches:
       - main
 
 jobs:
-  ci:
+  deploy:
     runs-on: ubuntu-latest
-
+    name: Deploy
     steps:
-      - uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: 1.0.1
-
-      - name: Checkout
-        uses: actions/checkout@master
-
-      - name: Install Dependencies
-        run: bun i
-
-      - name: Build
-        run: bun run build
-        env:
-          NITRO_PRESET: cloudflare
-
-      - name: Publish to Cloudflare
+      - uses: actions/checkout@v3
+      - name: Deploy
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
