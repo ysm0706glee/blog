@@ -2,7 +2,7 @@ name = "playground"
 main = "./.output/server/index.mjs"
 workers_dev = true
 compatibility_date = "2022-09-10"
-account_id = "798710ef066bae8c4a159726df47e5b4"
+account_id = ""
 
 [site]
 bucket = ".output/public"
