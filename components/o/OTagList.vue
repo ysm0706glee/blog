@@ -24,7 +24,7 @@ const onToggleTag = (tagId: Tag["id"]) => {
         ? 'primary'
         : 'gray'
     "
-    class="cursor-pointer"
+    class="cursor-pointer py-1 px-3 rounded-full text-sm mr-2 mb-2"
     @click="onToggleTag(tag.id)"
   />
 </template>

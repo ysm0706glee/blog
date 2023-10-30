@@ -23,6 +23,8 @@ export const useBlog = () => {
     offset: number,
     limit: number
   ): Promise<Blog[] | null> => {
+    setIsFetching(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     const { data, error } = await supabase
       .from("blogs")
       .select("*")
@@ -33,18 +35,16 @@ export const useBlog = () => {
       return null;
     }
     blogsState.value.push(...data);
+    setIsFetching(false);
     return data;
   };
 
   const getBlogsWithInfiniteScroll = async () => {
     if (!hasMoreData.value) return;
-    setIsFetching(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
     const blogs = await getBlogs(offsetState.value, limitState.value);
     if (!blogs?.length) {
       setHasMoreData(false);
     }
-    setIsFetching(false);
   };
 
   const getBlogsByTags = async (
@@ -52,6 +52,8 @@ export const useBlog = () => {
     offset: number,
     limit: number
   ): Promise<Blog[] | null> => {
+    setIsFetching(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     const { data, error } = await supabase
       .from("blogs")
       .select(` *, tags!inner (*)`)
@@ -66,13 +68,12 @@ export const useBlog = () => {
       return null;
     }
     blogsState.value.push(...data);
+    setIsFetching(false);
     return data;
   };
 
   const getBlogsWithInfiniteScrollByTags = async (tags: Tag[]) => {
     if (!hasMoreData.value) return;
-    setIsFetching(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
     const blogs = await getBlogsByTags(
       tags,
       offsetState.value,
@@ -81,7 +82,6 @@ export const useBlog = () => {
     if (!blogs?.length) {
       setHasMoreData(false);
     }
-    setIsFetching(false);
   };
 
   const postBlogTags = async (

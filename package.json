@@ -18,6 +18,7 @@
     "vue3-toastify": "^0.1.13"
   },
   "dependencies": {
+    "@iconify-json/bxl": "^1.1.7",
     "@nuxt/ui": "^2.8.1",
     "@trpc/client": "^10.38.5",
     "@trpc/server": "^10.38.5",

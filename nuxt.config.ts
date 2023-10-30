@@ -9,6 +9,9 @@ export default defineNuxtConfig({
     url: process.env.SUPABASE_URL ?? SUPABASE_URL,
     key: process.env.SUPABASE_KEY ?? SUPABASE_KEY,
   },
+  ui: {
+    icons: ["bxl"],
+  },
   build: {
     transpile: ["trpc-nuxt"],
   },
