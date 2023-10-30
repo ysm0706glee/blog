@@ -10,14 +10,25 @@ provide(blogInjectionKey, _useBlog);
 
 provide(tagInjectionKey, _useTag);
 
-const { blogsState, offsetState, limitState, getBlogs, getBlogsByTags } =
-  _useBlog;
+const {
+  blogsState,
+  offsetState,
+  limitState,
+  hasMoreData,
+  getBlogs,
+  getBlogsByTags,
+} = _useBlog;
 
 const { getTags } = _useTag;
 
 const onGetBlogsWithInfiniteByTags = async (tags: Tag[]) => {
   blogsState.value = [];
   offsetState.value = 0;
+  if (tags.length === 0) {
+    hasMoreData.value = true;
+    await getBlogs(offsetState.value, limitState.value);
+    return;
+  }
   await getBlogsByTags(tags, offsetState.value, limitState.value);
 };
 
