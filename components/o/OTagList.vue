@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Tag } from "~/types/tag";
+import type { Tag } from "@/types/tag";
 
 const { tagState, selectedTags } = inject(tagInjectionKey)!;
 

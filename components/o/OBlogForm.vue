@@ -2,7 +2,7 @@
 import { useField, useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as zod from "zod";
-import { Blog } from "~/types/blog";
+import type { Blog } from "@/types/blog";
 import { tagInjectionKey } from "~/composables/useTag";
 
 type Props = {

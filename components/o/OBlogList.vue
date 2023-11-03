@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useInfiniteScroll } from "@vueuse/core";
-import { Tag } from "~/types/tag";
+import type { Tag } from "@/types/tag";
 
 const {
   blogsState,

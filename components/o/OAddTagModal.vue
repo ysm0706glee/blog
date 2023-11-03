@@ -2,7 +2,7 @@
 import { useField, useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as zod from "zod";
-import { Tag } from "~/types/tag";
+import type { Tag } from "@/types/tag";
 
 type Props = {
   isOpenAddTagModal: boolean;

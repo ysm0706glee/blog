@@ -1,5 +1,5 @@
-import { Tag } from "~/types/tag";
-import { Database } from "~/types/supabase";
+import type { Tag } from "@/types/tag";
+import type { Database } from "@/types/supabase";
 
 export const useTag = () => {
   const supabase = useSupabaseClient<Database>();
