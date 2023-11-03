@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { blogInjectionKey } from "~/composables/useBlog";
-import { Tag } from "~/types/tag";
+import type { Tag } from "@/types/tag";
 
 const _useBlog = useBlog();
 
