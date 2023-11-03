@@ -23,13 +23,13 @@ jobs:
       - name: Install Dependencies
         run: bun i
 
-      - name: Run Tests
-        run: bun run test
-
       - name: Build
         run: bun run build
         env:
           NITRO_PRESET: cloudflare
+
+      - name: Run Tests
+        run: bun run test
 
       - name: Publish to Cloudflare
         uses: cloudflare/wrangler-action@v3
