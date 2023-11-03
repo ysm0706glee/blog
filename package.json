@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare",
     "deploy:preview": "bunx wrangler login && NITRO_PRESET=cloudflare bun run build && bunx wrangler dev",
     "test": "vitest",
+    "coverage": "vitest run --coverage",
     "update": "bunx npm-check-updates -ui"
   },
   "devDependencies": {
