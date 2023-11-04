@@ -31,6 +31,7 @@ const afterGettingOgp = () => {
 <template>
   <div>
     <OOgpForm
+      class="mb-8"
       @set-blog-data="setBlogData"
       @after-getting-ogp="afterGettingOgp"
     />

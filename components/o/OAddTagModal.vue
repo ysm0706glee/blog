@@ -60,7 +60,7 @@ const onToggleTag = (tagId: Tag["id"]) => {
 
 <template>
   <UModal :model-value="isOpenAddTagModal" @update:model-value="onClose">
-    <form @submit="onPost">
+    <form class="m-4 flex flex-col gap-4" @submit="onPost">
       <div>
         <label for="name">Name</label>
         <UInput id="name" v-model="name.value.value" />
