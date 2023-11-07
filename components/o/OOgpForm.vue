@@ -57,11 +57,12 @@ watch(url, (newUrl) => {
 </script>
 
 <template>
-  <form @submit.prevent="onGetOgp">
+  <form
+    class="flex justify-center items-center gap-4"
+    @submit.prevent="onGetOgp"
+  >
     <div>
-      <label for="url">A blog url</label>
-      <UInput id="url" v-model="url" name="url" />
-      <!-- TODO:  -->
+      <UInput v-model="url" placeholder="A blog url" />
       <span>{{ errors.url }}</span>
     </div>
     <UButton type="submit">Get OGP</UButton>

@@ -111,7 +111,10 @@ const openAddTagModal = () => {
 </script>
 
 <template>
-  <form @submit="onPost">
+  <form
+    class="flex flex-col justify-center items-center gap-4"
+    @submit="onPost"
+  >
     <div>
       <label for="title">Title(Required)</label>
       <UInput id="title" v-model="title.value.value" />
@@ -144,13 +147,13 @@ const openAddTagModal = () => {
         </div>
       </template>
     </div>
-    <div>
+    <div class="flex flex-col">
       <label for="image">Tags</label>
       <template v-if="tagState.length">
         <OTagList @on-toggle-tag="toggleTag" />
       </template>
       <div>
-        <UButton label="Open" @click="openAddTagModal" />
+        <UButton label="Add tag" @click="openAddTagModal" />
         <OAddTagModal
           :is-open-add-tag-modal="isOpenAddTagModal"
           @update:is-open-add-tag-modal="isOpenAddTagModal = $event"
