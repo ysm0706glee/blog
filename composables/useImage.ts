@@ -4,10 +4,17 @@ import {
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 
-const BUCKET_NAME = "blog-develop";
+const BUCKET_NAME_DEVELOP = "blog-develop";
+
+const BUCKET_NAME_PRODUCTION = "blog-production";
 
 export const useImage = () => {
   const runtimeConfig = useRuntimeConfig();
+
+  const BUCKET_NAME =
+    runtimeConfig.public.NUXT_NODE_ENV === "production"
+      ? BUCKET_NAME_PRODUCTION
+      : BUCKET_NAME_DEVELOP;
 
   const S3 = new S3Client({
     region: "auto",
