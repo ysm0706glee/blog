@@ -24,15 +24,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
 
-      - name: Cache Bun dependencies
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.bun
-            **/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-${{ github.run_id }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
+      # - name: Cache Bun dependencies
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: |
+      #       ~/.bun
+      #       **/node_modules
+      #     key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-${{ github.run_id }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-bun-
 
       - name: Install Dependencies
         run: bun i
