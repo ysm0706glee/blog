@@ -18,7 +18,7 @@ export const useImage = () => {
 
   const S3 = new S3Client({
     region: "auto",
-    endpoint: `https://${runtimeConfig.public.CLOUDFLARE_API_SECRET}.r2.cloudflarestorage.com`,
+    endpoint: `https://${runtimeConfig.public.CLOUDFLARE_API_SECRET}.eu.r2.cloudflarestorage.com`,
     credentials: {
       accessKeyId: runtimeConfig.public.CLOUDFLARE_ACCESS_KEY_ID,
       secretAccessKey: runtimeConfig.public.CLOUDFLARE_SECRET_ACCESS_KEY,
