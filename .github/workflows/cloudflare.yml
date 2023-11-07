@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: oven-sh/setup-bun@v1
         with:
-          bun-version: "latest"
+          bun-version: "1.0.10"
 
       - name: Checkout
         uses: actions/checkout@master
