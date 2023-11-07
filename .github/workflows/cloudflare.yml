@@ -30,7 +30,7 @@ jobs:
           path: |
             ~/.bun
             **/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-${{ github.run_id }}
           restore-keys: |
             ${{ runner.os }}-bun-
 
