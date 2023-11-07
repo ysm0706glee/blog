@@ -11,6 +11,9 @@ jobs:
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      CLOUDFLARE_API_SECRET: ${{ secrets.CLOUDFLARE_API_SECRET }}
+      CLOUDFLARE_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_ACCESS_KEY_ID }}
+      CLOUDFLARE_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_SECRET_ACCESS_KEY }}
       NODE_OPTIONS: --max-old-space-size=4096
 
     steps:
@@ -46,5 +49,6 @@ jobs:
       - name: Publish to Cloudflare
         uses: cloudflare/wrangler-action@v3
         with:
+          # TODO: chnage name to CLOUDFLARE_xxx
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}

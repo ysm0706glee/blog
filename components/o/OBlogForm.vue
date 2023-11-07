@@ -11,29 +11,33 @@ type Props = {
 
 const props = defineProps<Props>();
 
+// TODO: ! is not safe
 const { postBlog } = inject(blogInjectionKey)!;
 
 // TODO: ! is not safe
 const { tagState, selectedTags, toggleTag } = inject(tagInjectionKey)!;
 
+// TODO: ! is not safe
+const { postImage, deleteImage } = inject(imageInjectionKey)!;
+
 const validationSchema = toTypedSchema(
   zod.object({
     url: zod
       .string()
-      .nonempty("Field is required")
+      .min(1, "Field is required")
       .url({ message: "Must be a valid url" })
       .default(props.blogData.url),
     title: zod
       .string()
-      .nonempty("Field is required")
+      .min(1, "Field is required")
       .default(props.blogData.title),
     description: zod
       .string()
-      .nonempty("Field is required")
+      .min(1, "Field is required")
       .default(props.blogData.description),
     image: zod
       .string()
-      .nonempty("Field is required")
+      .min(1, "Field is required")
       .default(props.blogData.image),
   })
 );
@@ -50,6 +54,8 @@ const fields = {
 };
 
 const { title, description, image } = fields;
+
+const temporaryImageKey = ref("");
 
 const isOpenAddTagModal = ref(false);
 
@@ -68,13 +74,47 @@ const onPost = handleSubmit(async ({ url, title, description, image }) => {
     : useNuxtApp().$toast.error("error");
 });
 
+const updateImage = async (event: Event) => {
+  try {
+    const target = event.target;
+    if (target instanceof HTMLInputElement) {
+      const files = target.files;
+      if (files) {
+        const file = files[0];
+        const response = await postImage(file);
+        image.value.value = response.url;
+        temporaryImageKey.value = response.key;
+      }
+    } else {
+      console.error("Event target is not an HTMLInputElement");
+    }
+  } catch (error) {
+    console.error(error);
+    useNuxtApp().$toast.error("error");
+  }
+};
+
+const onDeleteImage = async () => {
+  try {
+    await deleteImage(temporaryImageKey.value);
+    image.value.value = "";
+    temporaryImageKey.value = "";
+  } catch (error) {
+    console.error(error);
+    useNuxtApp().$toast.error("error");
+  }
+};
+
 const openAddTagModal = () => {
   isOpenAddTagModal.value = true;
 };
 </script>
 
 <template>
-  <form @submit="onPost">
+  <form
+    class="flex flex-col justify-center items-center gap-4"
+    @submit="onPost"
+  >
     <div>
       <label for="title">Title(Required)</label>
       <UInput id="title" v-model="title.value.value" />
@@ -87,16 +127,33 @@ const openAddTagModal = () => {
     </div>
     <div>
       <label for="image">Image</label>
-      <UInput id="image" v-model="image.value.value" />
+      <UInput type="file" @change="updateImage" />
       <span>{{ errors.image }}</span>
+      <template v-if="image.value.value">
+        <div class="relative w-60 h-60">
+          <img
+            class="w-full h-full object-cover rounded"
+            :src="image.value.value"
+            alt="image-url"
+          />
+          <UButton
+            :padded="false"
+            color="gray"
+            variant="link"
+            icon="i-heroicons-x-mark-20-solid"
+            class="absolute top-0 right-0"
+            @click="onDeleteImage"
+          />
+        </div>
+      </template>
     </div>
-    <div>
+    <div class="flex flex-col">
       <label for="image">Tags</label>
       <template v-if="tagState.length">
         <OTagList @on-toggle-tag="toggleTag" />
       </template>
       <div>
-        <UButton label="Open" @click="openAddTagModal" />
+        <UButton label="Add tag" @click="openAddTagModal" />
         <OAddTagModal
           :is-open-add-tag-modal="isOpenAddTagModal"
           @update:is-open-add-tag-modal="isOpenAddTagModal = $event"
