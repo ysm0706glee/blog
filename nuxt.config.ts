@@ -1,5 +1,6 @@
 declare var SUPABASE_URL: string | undefined;
 declare var SUPABASE_KEY: string | undefined;
+declare var ENVIRONMENT: string | undefined;
 declare var CLOUDFLARE_API_SECRET: string | undefined;
 declare var CLOUDFLARE_ACCESS_KEY_ID: string | undefined;
 declare var CLOUDFLARE_SECRET_ACCESS_KEY: string | undefined;
@@ -20,7 +21,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      NODE_ENV: process.env.NODE_ENV,
+      ENVIRONMENT: process.env.NODE_ENV ?? ENVIRONMENT,
       CLOUDFLARE_API_SECRET:
         process.env.CLOUDFLARE_API_SECRET ?? CLOUDFLARE_API_SECRET,
       CLOUDFLARE_ACCESS_KEY_ID:

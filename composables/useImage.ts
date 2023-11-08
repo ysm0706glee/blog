@@ -12,7 +12,7 @@ export const useImage = () => {
   const runtimeConfig = useRuntimeConfig();
 
   const BUCKET_NAME =
-    runtimeConfig.public.NUXT_NODE_ENV === "production"
+    runtimeConfig.public.ENVIRONMENT === "production"
       ? BUCKET_NAME_PRODUCTION
       : BUCKET_NAME_DEVELOP;
 
@@ -35,7 +35,7 @@ export const useImage = () => {
       })
     );
     const url =
-      runtimeConfig.public.NUXT_NODE_ENV === "production"
+      runtimeConfig.public.ENVIRONMENT === "production"
         ? `https://takumaaa.dev/${key}`
         : `https://pub-cee5b3218211426eb6dfde5132bc4685.r2.dev/${key}`;
     return { url, key };
