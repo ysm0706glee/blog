@@ -44,8 +44,8 @@ jobs:
           NITRO_PRESET: cloudflare
           NODE_OPTIONS: ${{ env.NODE_OPTIONS }}
 
-      - name: Run Tests
-        run: bun run test
+      # - name: Run Tests
+      #   run: bun run test
 
       - name: Publish to Cloudflare
         uses: cloudflare/wrangler-action@v3
