@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   });
   // TODO: api
   const url =
-    process.env.NITRO_ENVIRONMENT === "production"
+    process.env.NODE_ENV === "production"
       ? `https://takumaaa.dev/${key}`
       : `https://pub-d3708211c39144ae993289f07732706f.r2.dev/${key}`;
 
