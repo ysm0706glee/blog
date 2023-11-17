@@ -9,10 +9,4 @@ export default defineNuxtConfig({
   ui: {
     icons: ["bxl"],
   },
-  runtimeConfig: {
-    ENVIRONMENT: process.env.NODE_ENV,
-    CLOUDFLARE_API_SECRET: process.env.CLOUDFLARE_API_SECRET,
-    CLOUDFLARE_ACCESS_KEY_ID: process.env.CLOUDFLARE_ACCESS_KEY_ID,
-    CLOUDFLARE_SECRET_ACCESS_KEY: process.env.CLOUDFLARE_SECRET_ACCESS_KEY,
-  },
 });
