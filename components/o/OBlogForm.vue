@@ -80,8 +80,8 @@ const updateImage = async (event: Event) => {
     if (target instanceof HTMLInputElement) {
       const files = target.files;
       if (files) {
-        const file = files[0];
-        const response = await postImage(file);
+        const response = await postImage(files[0]);
+        // TODO: type
         image.value.value = response.url;
         temporaryImageKey.value = response.key;
       }

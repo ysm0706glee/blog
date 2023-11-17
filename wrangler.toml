@@ -8,9 +8,3 @@ routes = [
 
 [site]
 bucket = ".output/public"
-
-[env.production.vars]
-ENVIRONMENT="production"
-CLOUDFLARE_API_SECRET=""
-CLOUDFLARE_ACCESS_KEY_ID=""
-CLOUDFLARE_SECRET_ACCESS_KEY=""

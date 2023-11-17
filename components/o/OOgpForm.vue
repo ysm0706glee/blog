@@ -4,7 +4,7 @@ import { toTypedSchema } from "@vee-validate/zod";
 import * as zod from "zod";
 import type { Blog } from "@/types/blog";
 
-const { $client } = useNuxtApp();
+const { getOgp } = inject(ogpInjectionKey)!;
 
 type Emits = {
   (emit: "after-getting-ogp"): void;
@@ -34,15 +34,13 @@ const { value: url } = useField<string>("url");
 
 const onGetOgp = handleSubmit(async ({ url }) => {
   if (!url.length) return;
-  const ogp = await $client.ogpRouter.getOgp.useQuery({
-    url,
-  });
-  if (!ogp.data.value) {
+  const ogp = await getOgp(url);
+  if (!ogp) {
     useNuxtApp().$toast.error("error");
     return;
   }
   emits("after-getting-ogp");
-  emits("set-blog-data", url, ogp.data.value);
+  emits("set-blog-data", url, ogp);
 });
 
 watch(url, (newUrl) => {
