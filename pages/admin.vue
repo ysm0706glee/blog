@@ -3,11 +3,15 @@ const _useBlog = useBlog();
 
 const _useTag = useTag();
 
+const _useOgp = useOgp();
+
 const _useImage = useImage();
 
 provide(blogInjectionKey, _useBlog);
 
 provide(tagInjectionKey, _useTag);
+
+provide(ogpInjectionKey, _useOgp);
 
 provide(imageInjectionKey, _useImage);
 
