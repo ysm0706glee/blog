@@ -17,7 +17,6 @@ export default defineEventHandler(async (event) => {
   await fetch(`https://${WORKER_NAME}.ysm0706glee.workers.dev/${key}`, {
     method: "delete",
     headers: {
-      // TODO: type
       "X-Custom-Auth-Key": process.env.X_CUSTOM_AUTH_KEY!,
     },
   });
