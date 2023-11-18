@@ -9,4 +9,8 @@ export default defineNuxtConfig({
   ui: {
     icons: ["bxl"],
   },
+  runtimeConfig: {
+    xCustomAuthKey: process.env.X_CUSTOM_AUTH_KEY,
+    test: process.env.NITRO_X_CUSTOM_AUTH_KEY,
+  },
 });

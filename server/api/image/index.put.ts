@@ -2,6 +2,8 @@ const WORKER_NAME_DEVELOP = "blog-development-r2";
 const WORKER_NAME_PRODUCTION = "blog-production-r2";
 
 export default defineEventHandler(async (event) => {
+  const test1 = useRuntimeConfig(event);
+  const xCustomAuthKey = useRuntimeConfig(event).xCustomAuthKey;
   const WORKER_NAME =
     process.env.NODE_ENV === "production"
       ? WORKER_NAME_PRODUCTION
@@ -18,7 +20,7 @@ export default defineEventHandler(async (event) => {
     method: "put",
     headers: {
       // TODO: type
-      "X-Custom-Auth-Key": process.env.X_CUSTOM_AUTH_KEY!,
+      "X-Custom-Auth-Key": xCustomAuthKey,
     },
     body: files[0].data,
   });
@@ -31,7 +33,7 @@ export default defineEventHandler(async (event) => {
   return {
     url,
     key,
-    environment: process.env.NODE_ENV,
-    test: process.env.X_CUSTOM_AUTH_KEY,
+    test1,
+    test2: xCustomAuthKey,
   };
 });
