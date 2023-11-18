@@ -31,5 +31,7 @@ export default defineEventHandler(async (event) => {
   return {
     url,
     key,
+    environment: process.env.NODE_ENV,
+    test: process.env.NODE_ENV,
   };
 });
