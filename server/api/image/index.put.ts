@@ -32,6 +32,6 @@ export default defineEventHandler(async (event) => {
     url,
     key,
     environment: process.env.NODE_ENV,
-    test: process.env.NODE_ENV,
+    test: process.env.X_CUSTOM_AUTH_KEY,
   };
 });
