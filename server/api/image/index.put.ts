@@ -27,7 +27,8 @@ export default defineEventHandler(async (event) => {
   );
   if (!response.ok) {
     throw new Error(
-      `HTTP error! status: ${response.status}` + process.env.NODE_ENV
+      `HTTP error! status: ${response.status}` +
+        `https://${WORKER_NAME}.ysm0706glee.workers.dev/${key}`
     );
   }
   try {
