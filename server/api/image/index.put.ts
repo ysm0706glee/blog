@@ -26,10 +26,7 @@ export default defineEventHandler(async (event) => {
     }
   );
   if (!response.ok) {
-    throw new Error(
-      `HTTP error! status: ${response.status}` +
-        `https://${WORKER_NAME}.ysm0706glee.workers.dev/${key}`
-    );
+    throw new Error(`HTTP error! status: ${response.status}` + response);
   }
   try {
     const data = await response.json();
