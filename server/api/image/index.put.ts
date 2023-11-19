@@ -26,7 +26,9 @@ export default defineEventHandler(async (event) => {
     }
   );
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}` + response);
+    throw new Error(
+      `HTTP error! status: ${response.status}` + JSON.stringify(response)
+    );
   }
   try {
     const data = await response.json();
