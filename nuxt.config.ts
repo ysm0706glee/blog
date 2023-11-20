@@ -11,6 +11,5 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     xCustomAuthKey: process.env.X_CUSTOM_AUTH_KEY,
-    test: process.env.NITRO_X_CUSTOM_AUTH_KEY,
   },
 });
