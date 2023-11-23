@@ -3,7 +3,7 @@ const WORKER_NAME_PRODUCTION = "blog-production-r2";
 
 export default defineEventHandler(async (event) => {
   const WORKER_NAME =
-    process.env.NITRO_ENVIRONMENT === "production"
+    process.env.NODE_ENV === "production"
       ? WORKER_NAME_PRODUCTION
       : WORKER_NAME_DEVELOP;
   const xCustomAuthKey = useRuntimeConfig(event).xCustomAuthKey;
