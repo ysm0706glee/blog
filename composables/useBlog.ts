@@ -6,6 +6,14 @@ export const useBlog = () => {
   const supabase = useSupabaseClient<Database>();
 
   const blogsState = ref<Blog[]>([]);
+  const blogDataState = ref<
+    Pick<Blog, "url" | "title" | "description" | "image">
+  >({
+    url: "",
+    title: "",
+    description: "",
+    image: "",
+  });
   const offsetState = ref(0);
   const limitState = ref(10);
   const isFetching = ref(false);
@@ -101,11 +109,21 @@ export const useBlog = () => {
     return true;
   };
 
-  const postBlog = async (
-    blog: Pick<Blog, "url" | "title" | "description" | "image">,
-    tags: Tag[]
-  ): Promise<Blog | null> => {
-    const { data, error } = await supabase.from("blogs").insert(blog).select();
+  const setBlogData = (
+    url: Blog["url"],
+    blog: Pick<Blog, "title" | "description" | "image">
+  ) => {
+    blogDataState.value = {
+      url,
+      ...blog,
+    };
+  };
+
+  const postBlog = async (tags: Tag[]): Promise<Blog | null> => {
+    const { data, error } = await supabase
+      .from("blogs")
+      .insert(blogDataState.value)
+      .select();
     if (error) {
       console.error("Error posting blog:", error);
       return null;
@@ -126,6 +144,7 @@ export const useBlog = () => {
 
   return {
     blogsState,
+    blogDataState,
     offsetState,
     limitState,
     isFetching,
@@ -136,6 +155,7 @@ export const useBlog = () => {
     getBlogsWithInfiniteScroll,
     getBlogsByTags,
     getBlogsWithInfiniteScrollByTags,
+    setBlogData,
     postBlog,
   };
 };
