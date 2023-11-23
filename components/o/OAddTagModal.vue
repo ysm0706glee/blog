@@ -11,14 +11,12 @@ type Props = {
 type Emits = {
   (emit: "update:is-open-add-tag-modal", payload: boolean): void;
   (emit: "toggle-tag", tagId: Tag["id"]): void;
+  (emit: "on-post-tag", name: Tag["name"]): Promise<Tag | null>;
 };
 
 const props = defineProps<Props>();
 
 const emits = defineEmits<Emits>();
-
-// TODO: ! is not safe
-const { tagState, getTags, postTag } = inject(tagInjectionKey)!;
 
 const validationSchema = toTypedSchema(
   zod.object({
@@ -36,37 +34,26 @@ const fields = {
 
 const { name } = fields;
 
-const onPost = handleSubmit(async ({ name }) => {
-  const response = await postTag(name);
-  if (response) {
-    useNuxtApp().$toast.success("success");
-    console.log(tagState);
-    await getTags();
-    console.log("LOOK: ", tagState);
-    onToggleTag(response.id);
-  } else {
-    useNuxtApp().$toast.error("error");
-  }
+const onPostBlog = handleSubmit(async ({ name }) => {
+  emits("on-post-tag", name);
 });
 
 const onClose = () => {
   emits("update:is-open-add-tag-modal", false);
 };
-
-const onToggleTag = (tagId: Tag["id"]) => {
-  emits("toggle-tag", tagId);
-};
 </script>
 
 <template>
   <UModal :model-value="isOpenAddTagModal" @update:model-value="onClose">
-    <form class="m-4 flex flex-col gap-4" @submit="onPost">
+    <form class="m-4 flex flex-col gap-4" @submit="onPostBlog">
       <div>
         <label for="name">Name</label>
         <UInput id="name" v-model="name.value.value" />
         <span>{{ errors.name }}</span>
       </div>
-      <UButton @click="onPost">Post</UButton>
+      <div>
+        <UButton @click="onPostBlog">Post</UButton>
+      </div>
     </form>
   </UModal>
 </template>

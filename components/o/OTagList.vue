@@ -15,7 +15,7 @@ const onToggleTag = (tagId: Tag["id"]) => {
 </script>
 
 <template>
-  <div class="flex">
+  <div class="flex flex-wrap">
     <UBadge
       v-for="tag in tagState"
       class="cursor-pointer py-1 px-3 rounded-full text-sm mr-2 mb-2"
