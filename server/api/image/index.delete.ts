@@ -6,6 +6,7 @@ export default defineEventHandler(async (event) => {
     process.env.NITRO_ENVIRONMENT === "production"
       ? WORKER_NAME_PRODUCTION
       : WORKER_NAME_DEVELOP;
+  const xCustomAuthKey = useRuntimeConfig(event).xCustomAuthKey;
   const { key }: { key: string } = getQuery(event);
   if (!key) {
     throw createError({
@@ -18,7 +19,7 @@ export default defineEventHandler(async (event) => {
     {
       method: "delete",
       headers: {
-        "X-Custom-Auth-Key": process.env.X_CUSTOM_AUTH_KEY!,
+        "X-Custom-Auth-Key": xCustomAuthKey,
       },
     }
   );
