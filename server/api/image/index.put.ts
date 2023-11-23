@@ -1,5 +1,13 @@
+import { z } from "zod";
+
 const WORKER_NAME_DEVELOP = "blog-development-r2";
 const WORKER_NAME_PRODUCTION = "blog-production-r2";
+
+const responseSchema = z.object({
+  url: z.string().url(),
+});
+
+type Response = z.infer<typeof responseSchema>;
 
 export default defineEventHandler(async (event) => {
   const xCustomAuthKey = useRuntimeConfig(event).xCustomAuthKey;
@@ -29,10 +37,10 @@ export default defineEventHandler(async (event) => {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
   try {
-    const data = await response.json();
-    const fileUrl = data.url;
+    const data: Response = await response.json();
+    const url = data.url;
     return {
-      url: fileUrl,
+      url,
       key,
     };
   } catch (error) {
