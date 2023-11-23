@@ -1,4 +1,8 @@
 export const useImage = () => {
+  const imageUrl = ref("");
+  const previewImageUrl = ref("");
+  const temporaryImageKey = ref("");
+
   const postImage = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -17,6 +21,9 @@ export const useImage = () => {
   };
 
   return {
+    imageUrl,
+    previewImageUrl,
+    temporaryImageKey,
     postImage,
     deleteImage,
   };
