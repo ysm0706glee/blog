@@ -2,23 +2,31 @@
 import { useField, useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as zod from "zod";
-import type { Blog } from "@/types/blog";
 import { tagInjectionKey } from "~/composables/useTag";
-
-type Props = {
-  blogData: Pick<Blog, "url" | "title" | "description" | "image">;
-};
-
-const props = defineProps<Props>();
+import type { Blog } from "@/types/blog";
+import type { Tag } from "~/types/tag";
 
 // TODO: ! is not safe
-const { postBlog } = inject(blogInjectionKey)!;
+const { blogDataState } = inject(blogInjectionKey)!;
+
+// TODO: ! is not safe
+const { imageUrl, previewImageUrl } = inject(imageInjectionKey)!;
 
 // TODO: ! is not safe
 const { tagState, selectedTags, toggleTag } = inject(tagInjectionKey)!;
 
-// TODO: ! is not safe
-const { postImage, deleteImage } = inject(imageInjectionKey)!;
+type Emits = {
+  (emit: "update-image", file: File): void;
+  (emit: "on-delete-image"): Promise<void>;
+  (emit: "on-post-tag", name: Tag["name"]): Promise<Tag | null>;
+  (
+    emit: "on-post-blog",
+    blog: Pick<Blog, "url" | "title" | "description" | "image">,
+    tags: Tag[]
+  ): Promise<Blog | null>;
+};
+
+const emits = defineEmits<Emits>();
 
 const validationSchema = toTypedSchema(
   zod.object({
@@ -26,19 +34,19 @@ const validationSchema = toTypedSchema(
       .string()
       .min(1, "Field is required")
       .url({ message: "Must be a valid url" })
-      .default(props.blogData.url),
+      .default(blogDataState.value.url),
     title: zod
       .string()
       .min(1, "Field is required")
-      .default(props.blogData.title),
+      .default(blogDataState.value.title),
     description: zod
       .string()
       .min(1, "Field is required")
-      .default(props.blogData.description),
+      .default(blogDataState.value.description),
     image: zod
       .string()
       .min(1, "Field is required")
-      .default(props.blogData.image),
+      .default(blogDataState.value.image),
   })
 );
 
@@ -55,85 +63,68 @@ const fields = {
 
 const { title, description, image } = fields;
 
-const temporaryImageKey = ref("");
-
 const isOpenAddTagModal = ref(false);
 
-const onPost = handleSubmit(async ({ url, title, description, image }) => {
-  const response = await postBlog(
-    {
-      url,
-      title,
-      description,
-      image,
-    },
-    selectedTags.value
-  );
-  response
-    ? useNuxtApp().$toast.success("success")
-    : useNuxtApp().$toast.error("error");
-});
-
 const updateImage = async (event: Event) => {
-  try {
-    const target = event.target;
-    if (target instanceof HTMLInputElement) {
-      const files = target.files;
-      if (files) {
-        const response = await postImage(files[0]);
-        // TODO: type
-        image.value.value = response.url;
-        temporaryImageKey.value = response.key;
-      }
+  const target = event.target;
+  if (target instanceof HTMLInputElement) {
+    const files = target.files;
+    if (files) {
+      const file = files?.[0];
+      previewImageUrl.value = URL.createObjectURL(file);
+      emits("update-image", file);
     } else {
-      console.error("Event target is not an HTMLInputElement");
+      console.error("Files is null");
     }
-  } catch (error) {
-    console.error(error);
-    useNuxtApp().$toast.error("error");
+  } else {
+    console.error("Event target is not an HTMLInputElement");
   }
 };
 
 const onDeleteImage = async () => {
-  try {
-    await deleteImage(temporaryImageKey.value);
-    image.value.value = "";
-    temporaryImageKey.value = "";
-  } catch (error) {
-    console.error(error);
-    useNuxtApp().$toast.error("error");
-  }
+  image.value.value = "";
+  emits("on-delete-image");
 };
 
 const openAddTagModal = () => {
   isOpenAddTagModal.value = true;
 };
+
+const onPostBlog = handleSubmit(async ({ url, title, description, image }) => {
+  emits("on-post-blog", { url, title, description, image }, selectedTags.value);
+});
+
+const onPostTag = (name: Tag["name"]) => {
+  emits("on-post-tag", name);
+};
+
+watch(imageUrl, (newImageUrl) => {
+  console.log("imageUrl", newImageUrl);
+  image.value.value = newImageUrl;
+});
 </script>
 
 <template>
-  <form
-    class="flex flex-col justify-center items-center gap-4"
-    @submit="onPost"
-  >
+  <form class="flex flex-col gap-4" @submit="onPostBlog">
     <div>
       <label for="title">Title(Required)</label>
       <UInput id="title" v-model="title.value.value" />
-      <span>{{ errors.title }}</span>
+      <span class="block min-h-[2rem]">{{ errors.title }}</span>
     </div>
     <div>
       <label for="description">Description(Required)</label>
-      <UInput id="description" v-model="description.value.value" />
-      <span>{{ errors.description }}</span>
+      <UTextarea id="description" v-model="description.value.value" />
+      <span class="block min-h-[2rem]">{{ errors.description }}</span>
     </div>
     <div>
       <label for="image">Image</label>
       <UInput type="file" @change="updateImage" />
-      <span>{{ errors.image }}</span>
-      <template v-if="image.value.value">
-        <div class="relative w-60 h-60">
+      <span class="block min-h-[2rem]">{{ errors.image }}</span>
+      <div class="relative w-60 h-60">
+        <template v-if="previewImageUrl">
           <img
             class="w-full h-full object-cover rounded"
-            :src="image.value.value"
+            :src="previewImageUrl"
             alt="image-url"
           />
           <UButton
@@ -144,8 +135,8 @@ const openAddTagModal = () => {
             class="absolute top-0 right-0"
             @click="onDeleteImage"
           />
-        </div>
-      </template>
+        </template>
+      </div>
     </div>
     <div class="flex flex-col">
       <label for="image">Tags</label>
@@ -158,9 +149,12 @@ const openAddTagModal = () => {
           :is-open-add-tag-modal="isOpenAddTagModal"
           @update:is-open-add-tag-modal="isOpenAddTagModal = $event"
           @toggle-tag="toggleTag"
+          @post-tag="onPostTag"
         />
       </div>
     </div>
-    <UButton @click="onPost">Post</UButton>
+    <div>
+      <UButton @click="onPostBlog">Post</UButton>
+    </div>
   </form>
 </template>

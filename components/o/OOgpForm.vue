@@ -4,9 +4,8 @@ import { toTypedSchema } from "@vee-validate/zod";
 import * as zod from "zod";
 import type { Blog } from "@/types/blog";
 
-const { getOgp } = inject(ogpInjectionKey)!;
-
 type Emits = {
+  (emit: "on-get-ogp", url: Blog["url"]): Promise<Blog | null>;
   (emit: "after-getting-ogp"): void;
   (
     emit: "set-blog-data",
@@ -33,14 +32,7 @@ const { handleSubmit, errors } = useForm({
 const { value: url } = useField<string>("url");
 
 const onGetOgp = handleSubmit(async ({ url }) => {
-  if (!url.length) return;
-  const ogp = await getOgp(url);
-  if (!ogp) {
-    useNuxtApp().$toast.error("error");
-    return;
-  }
-  emits("after-getting-ogp");
-  emits("set-blog-data", url, ogp);
+  emits("on-get-ogp", url);
 });
 
 watch(url, (newUrl) => {
@@ -55,13 +47,10 @@ watch(url, (newUrl) => {
 </script>
 
 <template>
-  <form
-    class="flex justify-center items-center gap-4"
-    @submit.prevent="onGetOgp"
-  >
+  <form @submit.prevent="onGetOgp">
     <div>
       <UInput v-model="url" placeholder="A blog url" />
-      <span>{{ errors.url }}</span>
+      <span class="block min-h-[2rem]">{{ errors.url }}</span>
     </div>
     <UButton type="submit">Get OGP</UButton>
   </form>
