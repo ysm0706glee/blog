@@ -10,11 +10,11 @@ const responseSchema = z.object({
 type Response = z.infer<typeof responseSchema>;
 
 export default defineEventHandler(async (event) => {
-  const xCustomAuthKey = useRuntimeConfig(event).xCustomAuthKey;
   const WORKER_NAME =
     process.env.NODE_ENV === "production"
       ? WORKER_NAME_PRODUCTION
       : WORKER_NAME_DEVELOP;
+  const xCustomAuthKey = useRuntimeConfig(event).xCustomAuthKey;
   const files = await readMultipartFormData(event);
   if (!files || files.length === 0) {
     throw createError({
