@@ -9,12 +9,6 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-      ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
-      CLOUDFLARE_API_SECRET: ${{ secrets.CLOUDFLARE_API_SECRET }}
-      CLOUDFLARE_ACCESS_KEY_ID: ${{ secrets.CLOUDFLARE_ACCESS_KEY_ID }}
-      CLOUDFLARE_SECRET_ACCESS_KEY: ${{ secrets.CLOUDFLARE_SECRET_ACCESS_KEY }}
       X_CUSTOM_AUTH_KEY: ${{ secrets.X_CUSTOM_AUTH_KEY }}
       NODE_OPTIONS: --max-old-space-size=4096
 
@@ -25,16 +19,6 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@master
-
-      # - name: Cache Bun dependencies
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: |
-      #       ~/.bun
-      #       **/node_modules
-      #     key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}-${{ github.run_id }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-bun-
 
       - name: Install Dependencies
         run: bun i
@@ -51,6 +35,5 @@ jobs:
       - name: Publish to Cloudflare
         uses: cloudflare/wrangler-action@v3
         with:
-          # TODO: chnage name to CLOUDFLARE_xxx
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
