@@ -149,7 +149,7 @@ watch(imageUrl, (newImageUrl) => {
           :is-open-add-tag-modal="isOpenAddTagModal"
           @update:is-open-add-tag-modal="isOpenAddTagModal = $event"
           @toggle-tag="toggleTag"
-          @post-tag="onPostTag"
+          @on-post-tag="onPostTag"
         />
       </div>
     </div>

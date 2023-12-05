@@ -1,8 +1,17 @@
-import type { Tag } from "@/types/tag";
-import type { Database } from "@/types/supabase";
+import { z } from "zod";
+import { tagSchema, type Tag } from "@/types/tag";
+
+const getTagsResponseSchema = z.object({ tags: z.array(tagSchema) });
+
+type GetTagsResponse = z.infer<typeof getTagsResponseSchema>;
+
+const postTagResponseSchema = z.object({ tag: tagSchema });
+
+type PostTagResponse = z.infer<typeof postTagResponseSchema>;
 
 export const useTag = () => {
-  const supabase = useSupabaseClient<Database>();
+  const runtimeConfig = useRuntimeConfig();
+  const d1ApiUrl = runtimeConfig.public.d1ApiUrl;
 
   const tagState = ref<Tag[]>([]);
   const selectedTags = ref<Tag[]>([]);
@@ -20,26 +29,46 @@ export const useTag = () => {
   };
 
   const getTags = async (): Promise<Tag[] | null> => {
-    const { data: tags, error } = await supabase.from("tags").select("*");
-    if (error) {
+    const { data, error } = await useFetch<GetTagsResponse>(`${d1ApiUrl}/tags`);
+    if (error.value) {
       console.error(error);
+      createError({
+        statusCode: 500,
+        statusMessage: "Internal Server Error",
+      });
+    }
+    if (!data.value?.tags) {
       return null;
     }
-    tagState.value = tags;
-    return tags;
+    tagState.value = data.value.tags;
+    return data.value.tags;
   };
 
   const postTag = async (name: string): Promise<Tag | null> => {
-    const { data: tag, error } = await supabase
-      .from("tags")
-      .insert({ name })
-      .select();
-    if (error) {
+    const { data, error } = await useFetch<PostTagResponse>(`${d1ApiUrl}/tag`, {
+      method: "post",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ name }),
+    });
+    if (error.value) {
       console.error(error);
+      createError({
+        statusCode: 500,
+        statusMessage: "Internal Server Error",
+      });
       return null;
     }
-    tagState.value = [tag[0], ...tagState.value];
-    return tag[0];
+    if (!data.value?.tag) {
+      createError({
+        statusCode: 500,
+        statusMessage: "Internal Server Error",
+      });
+      return null;
+    }
+    tagState.value = [data.value.tag, ...tagState.value];
+    return data.value.tag;
   };
 
   return {

@@ -53,7 +53,7 @@ const onPostBlog = (
       <OBlogForm
         @update-image="updateImage"
         @on-delete-image="onDeleteImage"
-        @post-tag="onPostTag"
+        @on-post-tag="onPostTag"
         @on-post-blog="onPostBlog"
       />
     </template>
