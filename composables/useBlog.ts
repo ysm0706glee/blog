@@ -1,9 +1,18 @@
-import type { Database } from "@/types/supabase";
-import type { Blog } from "@/types/blog";
+import { blogSchema, type Blog } from "@/types/blog";
 import type { Tag } from "@/types/tag";
+import { z } from "zod";
+
+const getBlogsResponseSchema = z.object({ blogs: z.array(blogSchema) });
+
+type GetBlogsResponse = z.infer<typeof getBlogsResponseSchema>;
+
+const postBlogResponseSchema = z.object({ blog: blogSchema });
+
+type PostBlogResponse = z.infer<typeof postBlogResponseSchema>;
 
 export const useBlog = () => {
-  const supabase = useSupabaseClient<Database>();
+  const runtimeConfig = useRuntimeConfig();
+  const d1ApiUrl = runtimeConfig.public.d1ApiUrl;
 
   const blogsState = ref<Blog[]>([]);
   const blogDataState = ref<
@@ -33,18 +42,24 @@ export const useBlog = () => {
   ): Promise<Blog[] | null> => {
     setIsFetching(true);
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    const { data, error } = await supabase
-      .from("blogs")
-      .select("*")
-      .range(offset, offset + limit - 1);
-    offsetState.value += limitState.value;
-    if (error) {
+    const { data, error } = await useFetch<GetBlogsResponse>(
+      `${d1ApiUrl}/blogs?offset=${offset}&limit=${limit}`
+    );
+    setIsFetching(false);
+    if (error.value) {
       console.error(error);
+      createError({
+        statusCode: 500,
+        statusMessage: "Internal Server Error",
+      });
       return null;
     }
-    blogsState.value.push(...data);
-    setIsFetching(false);
-    return data;
+    if (!data.value?.blogs) {
+      return null;
+    }
+    blogsState.value.push(...data.value.blogs);
+    offsetState.value += limitState.value;
+    return data.value.blogs;
   };
 
   const getBlogsWithInfiniteScroll = async () => {
@@ -62,22 +77,26 @@ export const useBlog = () => {
   ): Promise<Blog[] | null> => {
     setIsFetching(true);
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    const { data, error } = await supabase
-      .from("blogs")
-      .select(` *, tags!inner (*)`)
-      .in(
-        "tags.id",
-        tags.map((tag) => tag.id)
-      )
-      .range(offset, offset + limit - 1);
-    offsetState.value += limitState.value;
-    if (error) {
+    const { data, error } = await useFetch<GetBlogsResponse>(
+      `${d1ApiUrl}/blogs-with-tags?offset=${offset}&limit=${limit}&tags=${tags
+        .map((tag) => tag.id)
+        .join(",")}`
+    );
+    setIsFetching(false);
+    if (error.value) {
       console.error(error);
+      createError({
+        statusCode: 500,
+        statusMessage: "Internal Server Error",
+      });
       return null;
     }
-    blogsState.value.push(...data);
-    setIsFetching(false);
-    return data;
+    if (!data.value?.blogs) {
+      return null;
+    }
+    blogsState.value.push(...data.value.blogs);
+    offsetState.value += limitState.value;
+    return data.value.blogs;
   };
 
   const getBlogsWithInfiniteScrollByTags = async (tags: Tag[]) => {
@@ -96,14 +115,22 @@ export const useBlog = () => {
     blogId: number,
     tags: Tag[]
   ): Promise<boolean> => {
-    const { error } = await supabase.from("blog_tags").insert(
-      tags.map((tag) => ({
-        blog_id: blogId,
-        tag_id: tag.id,
-      }))
-    );
-    if (error) {
+    const { data, error } = await useFetch(`${d1ApiUrl}/blog-tags`, {
+      method: "post",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        blogId,
+        tagIds: tags.map((tag) => tag.id),
+      }),
+    });
+    if (error.value) {
       console.error("Error posting blog tags:", error);
+      createError({
+        statusCode: 500,
+        statusMessage: "Internal Server Error",
+      });
       return false;
     }
     return true;
@@ -120,21 +147,42 @@ export const useBlog = () => {
   };
 
   const postBlog = async (tags: Tag[]): Promise<Blog | null> => {
-    const { data, error } = await supabase
-      .from("blogs")
-      .insert(blogDataState.value)
-      .select();
-    if (error) {
-      console.error("Error posting blog:", error);
+    const { data, error } = await useFetch<PostBlogResponse>(
+      `${d1ApiUrl}/blog`,
+      {
+        method: "post",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(blogDataState.value),
+      }
+    );
+    if (error.value) {
+      console.error(error);
+      createError({
+        statusCode: 500,
+        statusMessage: "Internal Server Error",
+      });
       return null;
     }
-    const newBlog = data[0];
+    if (!data.value?.blog) {
+      createError({
+        statusCode: 500,
+        statusMessage: "Internal Server Error",
+      });
+      return null;
+    }
+    const newBlog = data.value.blog;
     if (tags.length) {
       const success = await postBlogTags(newBlog.id, tags);
       if (!success) {
         console.error(
           "Failed to post blog tags. Consider rolling back blog insertion."
         );
+        createError({
+          statusCode: 500,
+          statusMessage: "Internal Server Error",
+        });
         return null;
       }
     }
