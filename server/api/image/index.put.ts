@@ -15,6 +15,7 @@ export default defineEventHandler(async (event) => {
       ? WORKER_NAME_PRODUCTION
       : WORKER_NAME_DEVELOP;
   const authKey = useRuntimeConfig(event).authKey;
+  console.log("authKey: ", authKey);
   const files = await readMultipartFormData(event);
   if (!files || files.length === 0) {
     throw createError({
@@ -28,7 +29,7 @@ export default defineEventHandler(async (event) => {
     {
       method: "put",
       headers: {
-        "X-Custom-Auth-Key": authKey,
+        "Auth-Key": authKey,
       },
       body: files[0].data,
     }
