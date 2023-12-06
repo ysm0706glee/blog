@@ -40,7 +40,6 @@ export default defineEventHandler(async (event) => {
     const data: Response = await response.json();
     const url = data.url;
     return {
-      authKey,
       url,
       key,
     };
