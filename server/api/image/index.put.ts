@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     process.env.NODE_ENV === "production"
       ? WORKER_NAME_PRODUCTION
       : WORKER_NAME_DEVELOP;
-  const xCustomAuthKey = useRuntimeConfig(event).xCustomAuthKey;
+  const authKey = useRuntimeConfig(event).authKey;
   const files = await readMultipartFormData(event);
   if (!files || files.length === 0) {
     throw createError({
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
     {
       method: "put",
       headers: {
-        "X-Custom-Auth-Key": xCustomAuthKey,
+        "X-Custom-Auth-Key": authKey,
       },
       body: files[0].data,
     }
