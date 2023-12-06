@@ -15,7 +15,6 @@ export default defineEventHandler(async (event) => {
       ? WORKER_NAME_PRODUCTION
       : WORKER_NAME_DEVELOP;
   const authKey = useRuntimeConfig(event).authKey;
-  console.log("authKey: ", authKey);
   const files = await readMultipartFormData(event);
   if (!files || files.length === 0) {
     throw createError({
@@ -41,6 +40,7 @@ export default defineEventHandler(async (event) => {
     const data: Response = await response.json();
     const url = data.url;
     return {
+      authKey,
       url,
       key,
     };

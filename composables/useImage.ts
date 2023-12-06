@@ -10,6 +10,7 @@ export const useImage = () => {
       method: "put",
       body: formData,
     });
+    console.log(response.data.value?.authKey);
     return response.data.value;
   };
 
