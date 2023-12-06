@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     {
       method: "delete",
       headers: {
-        "X-Custom-Auth-Key": authKey,
+        "Auth-Key": authKey,
       },
     }
   );
