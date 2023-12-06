@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     process.env.NODE_ENV === "production"
       ? WORKER_NAME_PRODUCTION
       : WORKER_NAME_DEVELOP;
-  const xCustomAuthKey = useRuntimeConfig(event).xCustomAuthKey;
+  const authKey = useRuntimeConfig(event).authKey;
   const { key }: { key: string } = getQuery(event);
   if (!key) {
     throw createError({
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     {
       method: "delete",
       headers: {
-        "X-Custom-Auth-Key": xCustomAuthKey,
+        "X-Custom-Auth-Key": authKey,
       },
     }
   );

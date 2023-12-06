@@ -17,7 +17,7 @@ export default defineNuxtConfig({
     icons: ["bxl"],
   },
   runtimeConfig: {
-    xCustomAuthKey: process.env.X_CUSTOM_AUTH_KEY,
+    authKey: process.env.AUTH_KEY,
     public: {
       d1ApiUrl,
     },

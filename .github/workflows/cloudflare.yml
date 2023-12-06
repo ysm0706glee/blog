@@ -9,7 +9,7 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     env:
-      X_CUSTOM_AUTH_KEY: ${{ secrets.X_CUSTOM_AUTH_KEY }}
+      X_CUSTOM_AUTH_KEY: ${{ secrets.AUTH_KEY }}
       NODE_OPTIONS: --max-old-space-size=4096
 
     steps:
