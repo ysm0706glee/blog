@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AUTH_KEY: ${{ secrets.AUTH_KEY }}
+      NUXT_PUBLIC_GTAG_ID: ${{ secrets.NUXT_PUBLIC_GTAG_ID }}
       NODE_OPTIONS: --max-old-space-size=4096
 
     steps:

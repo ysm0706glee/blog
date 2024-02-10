@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Blog } from "@/types/blog";
-import type { Tag } from "~/types/tag";
+import type { Tag } from "@/types/tag";
 
 type Props = {
   isAfterGettingOgp: boolean;
