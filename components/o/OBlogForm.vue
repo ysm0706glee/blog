@@ -2,9 +2,9 @@
 import { useField, useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as zod from "zod";
-import { tagInjectionKey } from "~/composables/useTag";
+import { tagInjectionKey } from "@/composables/useTag";
 import type { Blog } from "@/types/blog";
-import type { Tag } from "~/types/tag";
+import type { Tag } from "@/types/tag";
 
 // TODO: ! is not safe
 const { blogDataState } = inject(blogInjectionKey)!;
