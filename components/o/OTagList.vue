@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { Tag } from "@/types/tag";
 
+const { gtag } = useGtag();
+
 const { tagState, selectedTags } = inject(tagInjectionKey)!;
 
 type Emits = {
@@ -9,7 +11,20 @@ type Emits = {
 
 const emits = defineEmits<Emits>();
 
+const isSelected = (tagId: Tag["id"]): boolean =>
+  selectedTags.value.some((selectedTag) => selectedTag.id === tagId);
+
 const onToggleTag = (tagId: Tag["id"]) => {
+  // Only fire the event if the tag is being added
+  const isAddingTag = !isSelected(tagId);
+  if (isAddingTag) {
+    const tag = tagState.value.find((tag) => tag.id === tagId);
+    gtag("event", "tag", {
+      event_category: "tag",
+      event_label: `clicked on ${tag?.name}`,
+      value: "user clicked on a tag",
+    });
+  }
   emits("on-toggle-tag", tagId);
 };
 </script>
