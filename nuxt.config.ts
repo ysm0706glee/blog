@@ -12,7 +12,7 @@ const d1ApiUrl =
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ["@nuxt/ui", "nuxt-gtag"],
+  modules: ["@nuxt/ui"],
   ui: {
     icons: ["bxl"],
   },
@@ -20,9 +20,7 @@ export default defineNuxtConfig({
     authKey: process.env.AUTH_KEY,
     public: {
       d1ApiUrl,
+      gtmId: process.env.GTM_ID,
     },
-  },
-  gtag: {
-    id: process.env.GTAG_ID,
   },
 });
