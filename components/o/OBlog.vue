@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { useGtm } from "@gtm-support/vue-gtm";
 import type { Blog } from "@/types/blog";
 
-const { gtag } = useGtag();
+const gtm = useGtm();
 
 type Props = {
   blog: Blog;
@@ -10,9 +11,10 @@ type Props = {
 const props = defineProps<Props>();
 
 const handleClick = () => {
-  gtag("event", "blog", {
-    event_category: "blog",
-    event_label: `clicked on ${props.blog.title}`,
+  gtm?.trackEvent({
+    event: "blog",
+    category: "blog",
+    label: `clicked on ${props.blog.title}`,
     value: "user clicked on a blog",
   });
   return navigateTo(props.blog.url, {
