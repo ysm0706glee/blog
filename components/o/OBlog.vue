@@ -15,7 +15,6 @@ const handleClick = () => {
     event: "blog",
     category: "blog",
     label: `clicked on ${props.blog.title}`,
-    value: "user clicked on a blog",
   });
   return navigateTo(props.blog.url, {
     open: {
