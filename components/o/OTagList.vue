@@ -24,7 +24,6 @@ const onToggleTag = (tagId: Tag["id"]) => {
       event: "tag",
       category: "tag",
       label: `clicked on ${tag?.name}`,
-      value: "user clicked on a tag",
     });
   }
   emits("on-toggle-tag", tagId);
