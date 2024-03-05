@@ -21,8 +21,7 @@ const onToggleTag = (tagId: Tag["id"]) => {
   if (isAddingTag) {
     const tag = tagState.value.find((tag) => tag.id === tagId);
     gtm?.trackEvent({
-      event: "tag",
-      category: "tag",
+      event: "tag_name",
       label: `clicked on ${tag?.name}`,
     });
   }
