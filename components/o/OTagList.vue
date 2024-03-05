@@ -22,7 +22,7 @@ const onToggleTag = (tagId: Tag["id"]) => {
     const tag = tagState.value.find((tag) => tag.id === tagId);
     gtm?.trackEvent({
       event: "tag_name",
-      label: `clicked on ${tag?.name}`,
+      tag_name: `clicked on ${tag?.name}`,
     });
   }
   emits("on-toggle-tag", tagId);
