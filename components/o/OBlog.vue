@@ -12,8 +12,7 @@ const props = defineProps<Props>();
 
 const handleClick = () => {
   gtm?.trackEvent({
-    event: "blog",
-    category: "blog",
+    event: "blog_name",
     label: `clicked on ${props.blog.title}`,
   });
   return navigateTo(props.blog.url, {
