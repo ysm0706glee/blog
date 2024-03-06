@@ -13,7 +13,7 @@ const props = defineProps<Props>();
 const handleClick = () => {
   gtm?.trackEvent({
     event: "blog_name",
-    tag_name: `clicked on ${props.blog.title}`,
+    blog_name: `clicked on ${props.blog.title}`,
   });
   return navigateTo(props.blog.url, {
     open: {
