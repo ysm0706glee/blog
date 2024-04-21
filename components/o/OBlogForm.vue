@@ -2,9 +2,7 @@
 import { useField, useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as zod from "zod";
-import { tagInjectionKey } from "@/composables/useTag";
 import type { Blog } from "@/types/blog";
-import type { Tag } from "@/types/tag";
 
 // TODO: ! is not safe
 const { blogDataState } = inject(blogInjectionKey)!;
@@ -12,17 +10,12 @@ const { blogDataState } = inject(blogInjectionKey)!;
 // TODO: ! is not safe
 const { imageUrl, previewImageUrl } = inject(imageInjectionKey)!;
 
-// TODO: ! is not safe
-const { tagState, selectedTags, toggleTag } = inject(tagInjectionKey)!;
-
 type Emits = {
   (emit: "update-image", file: File): void;
   (emit: "on-delete-image"): Promise<void>;
-  (emit: "on-post-tag", name: Tag["name"]): Promise<Tag | null>;
   (
     emit: "on-post-blog",
-    blog: Pick<Blog, "url" | "title" | "description" | "image">,
-    tags: Tag[]
+    blog: Pick<Blog, "url" | "title" | "description" | "image">
   ): Promise<Blog | null>;
 };
 
@@ -91,12 +84,8 @@ const openAddTagModal = () => {
 };
 
 const onPostBlog = handleSubmit(async ({ url, title, description, image }) => {
-  emits("on-post-blog", { url, title, description, image }, selectedTags.value);
+  emits("on-post-blog", { url, title, description, image });
 });
-
-const onPostTag = (name: Tag["name"]) => {
-  emits("on-post-tag", name);
-};
 
 watch(imageUrl, (newImageUrl) => {
   console.log("imageUrl", newImageUrl);
@@ -122,7 +111,7 @@ watch(imageUrl, (newImageUrl) => {
       <span class="block min-h-[2rem]">{{ errors.image }}</span>
       <div class="relative w-60 h-60">
         <template v-if="previewImageUrl">
-          <img
+          <NuxtImg
             class="w-full h-full object-cover rounded"
             :src="previewImageUrl"
             alt="image-url"
@@ -136,21 +125,6 @@ watch(imageUrl, (newImageUrl) => {
             @click="onDeleteImage"
           />
         </template>
-      </div>
-    </div>
-    <div class="flex flex-col">
-      <label for="image">Tags</label>
-      <template v-if="tagState.length">
-        <OTagList @on-toggle-tag="toggleTag" />
-      </template>
-      <div>
-        <UButton label="Add tag" @click="openAddTagModal" />
-        <OAddTagModal
-          :is-open-add-tag-modal="isOpenAddTagModal"
-          @update:is-open-add-tag-modal="isOpenAddTagModal = $event"
-          @toggle-tag="toggleTag"
-          @on-post-tag="onPostTag"
-        />
       </div>
     </div>
     <div>

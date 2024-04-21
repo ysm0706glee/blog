@@ -1,10 +1,25 @@
 <script setup lang="ts">
 import { useInfiniteScroll } from "@vueuse/core";
+import type { Blog } from "~/types/blog";
 
 const { blogsState, isFetching, hasMoreData, getBlogsWithInfiniteScroll } =
   inject(blogInjectionKey)!;
 
 const scrollContainerRef = ref<HTMLElement | null>(null);
+
+type Emits = {
+  (emit: "on-delete-blog", blogId: Blog["id"]): Promise<void>;
+};
+
+const emits = defineEmits<Emits>();
+
+const isOpen = ref(false);
+const selectedBlogId = ref<Blog["id"] | null>(null);
+
+const onDeleteBlog = async () => {
+  if (!selectedBlogId.value) return;
+  await emits("on-delete-blog", selectedBlogId.value);
+};
 
 useInfiniteScroll(
   scrollContainerRef,
@@ -29,7 +44,13 @@ useInfiniteScroll(
         <li
           v-for="blog in blogsState"
           :key="blog.id"
-          class="p-4 border-b border-gray-700"
+          class="p-4 border-b border-gray-700 cursor-pointer"
+          @click="
+            () => {
+              isOpen = true;
+              selectedBlogId = blog.id;
+            }
+          "
         >
           <OBlog :blog="blog" />
         </li>
@@ -46,4 +67,17 @@ useInfiniteScroll(
       <p class="mt-4 text-lg text-gray-500">No blogs</p>
     </template>
   </div>
+  <!-- TODO: style -->
+  <UModal v-model="isOpen">
+    <p>Are you sure you want to delete?</p>
+    <UButton
+      @click="
+        () => {
+          onDeleteBlog();
+          isOpen = false;
+        }
+      "
+      >delete</UButton
+    >
+  </UModal>
 </template>
