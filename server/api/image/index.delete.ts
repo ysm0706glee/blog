@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     process.env.NODE_ENV === "production"
       ? WORKER_NAME_PRODUCTION
       : WORKER_NAME_DEVELOP;
-  const authKey = useRuntimeConfig(event).authKey;
+  const authKey = useRuntimeConfig().authKey;
   const { key }: { key: string } = getQuery(event);
   if (!key) {
     throw createError({

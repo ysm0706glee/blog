@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { Blog } from "@/types/blog";
-import type { Tag } from "@/types/tag";
+
+const { blogsState } = inject(blogInjectionKey)!;
+console.log(blogsState);
 
 type Props = {
   isAfterGettingOgp: boolean;
@@ -12,12 +14,11 @@ type Emits = {
   (emit: "on-get-ogp", url: Blog["url"]): Promise<Blog | null>;
   (emit: "update-image", file: File): void;
   (emit: "on-delete-image"): Promise<void>;
-  (emit: "on-post-tag", name: Tag["name"]): Promise<Tag | null>;
   (
     emit: "on-post-blog",
-    blog: Pick<Blog, "url" | "title" | "description" | "image">,
-    tags: Tag[]
+    blog: Pick<Blog, "url" | "title" | "description" | "image">
   ): Promise<Blog | null>;
+  (emit: "on-delete-blog", blogId: Blog["id"]): Promise<void>;
 };
 
 const emits = defineEmits<Emits>();
@@ -34,28 +35,29 @@ const onDeleteImage = () => {
   emits("on-delete-image");
 };
 
-const onPostTag = (name: Tag["name"]) => {
-  emits("on-post-tag", name);
+const onPostBlog = (
+  blog: Pick<Blog, "url" | "title" | "description" | "image">
+) => {
+  emits("on-post-blog", blog);
 };
 
-const onPostBlog = (
-  blog: Pick<Blog, "url" | "title" | "description" | "image">,
-  tags: Tag[]
-) => {
-  emits("on-post-blog", blog, tags);
+const onDeleteBlog = (blogId: Blog["id"]) => {
+  emits("on-delete-blog", blogId);
 };
 </script>
 
 <template>
   <div>
+    <h2>Add new blog</h2>
     <OOgpForm class="mb-8" @on-get-ogp="onGetOgp" />
     <template v-if="isAfterGettingOgp">
       <OBlogForm
         @update-image="updateImage"
         @on-delete-image="onDeleteImage"
-        @on-post-tag="onPostTag"
         @on-post-blog="onPostBlog"
       />
     </template>
+    <h2>Your blogs</h2>
+    <OAdminBlogList @on-delete-blog="onDeleteBlog" />
   </div>
 </template>

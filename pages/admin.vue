@@ -1,10 +1,8 @@
 <script setup lang="ts">
+import { useImage } from "@/composables/useImage";
 import type { Blog } from "@/types/blog";
-import type { Tag } from "@/types/tag";
 
 const _useBlog = useBlog();
-
-const _useTag = useTag();
 
 const _useOgp = useOgp();
 
@@ -16,16 +14,20 @@ provide(blogInjectionKey, _useBlog);
 
 provide(imageInjectionKey, _useImage);
 
-provide(tagInjectionKey, _useTag);
-
 const { getOgp } = _useOgp;
 
-const { setBlogData, postBlog } = _useBlog;
+const {
+  offsetState,
+  limitState,
+  getBlogs,
+  setBlogData,
+  postBlog,
+  deleteBlog,
+  getBlogsWithInfiniteScroll,
+} = _useBlog;
 
 const { imageUrl, previewImageUrl, temporaryImageKey, postImage, deleteImage } =
   _useImage;
-
-const { getTags, postTag, toggleTag } = _useTag;
 
 const isAfterGettingOgp = ref(false);
 
@@ -72,34 +74,28 @@ const onDeleteImage = async () => {
   }
 };
 
-const onPostTag = async (name: Tag["name"]) => {
-  const response = await postTag(name);
-  if (response) {
-    useNuxtApp().$toast.success("success");
-    await getTags();
-    toggleTag(response.id);
-  } else {
-    useNuxtApp().$toast.error("error");
-  }
-};
-
 const onPostBlog = async (
-  blog: Pick<Blog, "url" | "title" | "description" | "image">,
-  tags: Tag[]
+  blog: Pick<Blog, "url" | "title" | "description" | "image">
 ) => {
   setBlogData(blog.url, {
     title: blog.title,
     description: blog.description,
     image: blog.image,
   });
-  const response = await postBlog(tags);
+  const response = await postBlog();
   response
     ? useNuxtApp().$toast.success("success")
     : useNuxtApp().$toast.error("error");
 };
 
+const onDeleteBlog = async (blogId: Blog["id"]) => {
+  console.log(blogId);
+  await deleteBlog(blogId);
+  await getBlogsWithInfiniteScroll();
+};
+
 try {
-  await getTags();
+  await getBlogs(offsetState.value, limitState.value);
 } catch (error) {
   console.error(error);
   useNuxtApp().$toast.error("error");
@@ -112,7 +108,7 @@ try {
     @on-get-ogp="onGetOgp"
     @update-image="updateImage"
     @on-delete-image="onDeleteImage"
-    @on-post-tag="onPostTag"
     @on-post-blog="onPostBlog"
+    @on-delete-blog="onDeleteBlog"
   />
 </template>

@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     process.env.NODE_ENV === "production"
       ? WORKER_NAME_PRODUCTION
       : WORKER_NAME_DEVELOP;
-  const authKey = useRuntimeConfig(event).authKey;
+  const authKey = useRuntimeConfig().authKey;
   const files = await readMultipartFormData(event);
   if (!files || files.length === 0) {
     throw createError({
