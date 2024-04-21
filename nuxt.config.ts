@@ -12,7 +12,7 @@ const d1ApiUrl =
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ["@nuxt/ui", "nuxt-gtag"],
+  modules: ["@nuxt/ui", "nuxt-gtag", "@nuxt/image"],
   ui: {
     icons: ["bxl"],
   },
