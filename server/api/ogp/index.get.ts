@@ -2,12 +2,17 @@ import cheerio from "cheerio";
 
 export default defineEventHandler(async (event) => {
   try {
-    // TODO: type
     const { url } = getQuery(event);
     if (!url) {
       throw createError({
         status: 400,
         message: "url is required",
+      });
+    }
+    if (typeof url !== "string") {
+      throw createError({
+        status: 400,
+        message: "url must be a string",
       });
     }
     const response = await fetch(url);
