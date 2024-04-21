@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { useGtm } from "@gtm-support/vue-gtm";
 import type { Tag } from "@/types/tag";
 
-const { gtag } = useGtag();
+const gtm = useGtm();
 
 const { tagState, selectedTags } = inject(tagInjectionKey)!;
 
@@ -19,10 +20,9 @@ const onToggleTag = (tagId: Tag["id"]) => {
   const isAddingTag = !isSelected(tagId);
   if (isAddingTag) {
     const tag = tagState.value.find((tag) => tag.id === tagId);
-    gtag("event", "tag", {
-      event_category: "tag",
-      event_label: `clicked on ${tag?.name}`,
-      value: "user clicked on a tag",
+    gtm?.trackEvent({
+      event: "tag_name",
+      tag_name: `clicked on ${tag?.name}`,
     });
   }
   emits("on-toggle-tag", tagId);

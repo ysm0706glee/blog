@@ -20,9 +20,7 @@ export default defineNuxtConfig({
     authKey: process.env.AUTH_KEY,
     public: {
       d1ApiUrl,
+      gtmId: process.env.GTM_ID,
     },
-  },
-  gtag: {
-    id: process.env.GTAG_ID,
   },
 });
