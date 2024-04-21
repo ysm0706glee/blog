@@ -5,7 +5,7 @@
       Hello! I'm Takuma from Japan, a frontend engineer. Currently, I live in
       Spain. I like sports and traveling.
     </p>
-    <img
+    <NuxtImg
       src="/profile.jpeg"
       alt="profile"
       class="rounded-full h-64 w-64 object-cover mb-4"
