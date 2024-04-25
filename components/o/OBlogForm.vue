@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { useField, useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
-import * as zod from "zod";
+import { z } from "zod";
 import type { Blog } from "@/types/blog";
 
 // TODO: ! is not safe
 const { blogDataState } = inject(blogInjectionKey)!;
 
 // TODO: ! is not safe
-const { imageUrl, previewImageUrl } = inject(imageInjectionKey)!;
+const { previewImageUrl } = inject(imageInjectionKey)!;
 
 type Emits = {
-  (emit: "update-image", file: File): void;
+  (emit: "on-get-ogp", url: Blog["url"]): Promise<Blog | null>;
+  (emit: "on-update-image", file: File): void;
   (emit: "on-delete-image"): Promise<void>;
   (
     emit: "on-post-blog",
@@ -22,28 +23,18 @@ type Emits = {
 const emits = defineEmits<Emits>();
 
 const validationSchema = toTypedSchema(
-  zod.object({
-    url: zod
+  z.object({
+    url: z
       .string()
       .min(1, "Field is required")
-      .url({ message: "Must be a valid url" })
-      .default(blogDataState.value.url),
-    title: zod
-      .string()
-      .min(1, "Field is required")
-      .default(blogDataState.value.title),
-    description: zod
-      .string()
-      .min(1, "Field is required")
-      .default(blogDataState.value.description),
-    image: zod
-      .string()
-      .min(1, "Field is required")
-      .default(blogDataState.value.image),
+      .url({ message: "Must be a valid url" }),
+    title: z.string().min(1, "Field is required"),
+    description: z.string().min(1, "Field is required"),
+    image: z.string().min(1, "Field is required"),
   })
 );
 
-const { handleSubmit, errors } = useForm({
+const { handleSubmit, errors, setFieldValue } = useForm({
   validationSchema: validationSchema,
 });
 
@@ -54,18 +45,19 @@ const fields = {
   image: useField<Blog["image"]>("image"),
 };
 
-const { title, description, image } = fields;
+const { url, title, description, image } = fields;
 
-const isOpenAddTagModal = ref(false);
+const onGetOgp = async () => {
+  emits("on-get-ogp", url.value.value);
+};
 
-const updateImage = async (event: Event) => {
+const onUpdateImage = async (event: Event) => {
   const target = event.target;
   if (target instanceof HTMLInputElement) {
     const files = target.files;
     if (files) {
       const file = files?.[0];
-      previewImageUrl.value = URL.createObjectURL(file);
-      emits("update-image", file);
+      emits("on-update-image", file);
     } else {
       console.error("Files is null");
     }
@@ -79,22 +71,25 @@ const onDeleteImage = async () => {
   emits("on-delete-image");
 };
 
-const openAddTagModal = () => {
-  isOpenAddTagModal.value = true;
-};
-
 const onPostBlog = handleSubmit(async ({ url, title, description, image }) => {
   emits("on-post-blog", { url, title, description, image });
 });
 
-watch(imageUrl, (newImageUrl) => {
-  console.log("imageUrl", newImageUrl);
-  image.value.value = newImageUrl;
+watch(blogDataState, (newState) => {
+  setFieldValue("url", newState.url);
+  setFieldValue("title", newState.title);
+  setFieldValue("description", newState.description);
+  setFieldValue("image", newState.image);
 });
 </script>
 
 <template>
   <form class="flex flex-col gap-4" @submit="onPostBlog">
+    <div>
+      <UInput v-model="url.value.value" placeholder="blog url" />
+      <span class="block min-h-[2rem]">{{ errors.url }}</span>
+    </div>
+    <UButton @click="onGetOgp">Get the blog data by the blog url</UButton>
     <div>
       <label for="title">Title(Required)</label>
       <UInput id="title" v-model="title.value.value" />
@@ -107,7 +102,7 @@ watch(imageUrl, (newImageUrl) => {
     </div>
     <div>
       <label for="image">Image</label>
-      <UInput type="file" @change="updateImage" />
+      <UInput type="file" @change="onUpdateImage" />
       <span class="block min-h-[2rem]">{{ errors.image }}</span>
       <div class="relative w-60 h-60">
         <template v-if="previewImageUrl">

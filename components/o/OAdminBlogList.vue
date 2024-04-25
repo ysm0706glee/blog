@@ -52,7 +52,7 @@ useInfiniteScroll(
             }
           "
         >
-          <OBlog :blog="blog" />
+          <OAdminBlog :blog="blog" />
         </li>
       </ul>
     </template>
