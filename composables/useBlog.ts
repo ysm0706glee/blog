@@ -5,9 +5,11 @@ const getBlogsResponseSchema = z.object({ blogs: z.array(blogSchema) });
 
 type GetBlogsResponse = z.infer<typeof getBlogsResponseSchema>;
 
-const postBlogResponseSchema = z.object({ blog: blogSchema });
+const postBlogResponseSchema = z.object({ status: z.string() });
 
 type PostBlogResponse = z.infer<typeof postBlogResponseSchema>;
+
+const deleteBlogResponseSchema = z.object({ status: z.string() });
 
 export const useBlog = () => {
   const runtimeConfig = useRuntimeConfig();
@@ -79,44 +81,21 @@ export const useBlog = () => {
   };
 
   const postBlog = async () => {
-    const { data, error } = await useFetch<PostBlogResponse>(
-      `${d1ApiUrl}/blogs`,
-      {
-        method: "post",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(blogDataState.value),
-      }
-    );
-    if (error.value) {
-      console.error(error);
-      createError({
-        statusCode: 500,
-        statusMessage: "Internal Server Error",
-      });
-      return null;
-    }
-    if (!data.value?.blog) {
-      createError({
-        statusCode: 500,
-        statusMessage: "Internal Server Error",
-      });
-      return null;
-    }
+    const response = await useFetch<PostBlogResponse>(`${d1ApiUrl}/blogs`, {
+      method: "post",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: blogDataState.value,
+    });
+    postBlogResponseSchema.parse(response.data.value);
   };
 
   const deleteBlog = async (blogId: Blog["id"]) => {
-    const { error } = await useFetch(`${d1ApiUrl}/blogs/${blogId}`, {
+    const response = await useFetch(`${d1ApiUrl}/blogs/${blogId}`, {
       method: "delete",
     });
-    if (error.value) {
-      console.error(error);
-      createError({
-        statusCode: 500,
-        statusMessage: "Internal Server Error",
-      });
-    }
+    deleteBlogResponseSchema.parse(response.data.value);
   };
 
   return {
