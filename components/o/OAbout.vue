@@ -3,7 +3,7 @@
     <h2 class="text-3xl font-bold mb-4">About Me</h2>
     <p class="text-lg mb-4 text-center">
       Hello! I'm Takuma from Japan, a frontend engineer. Currently, I live in
-      Spain. I like sports and traveling.
+      Spain.
     </p>
     <NuxtImg
       src="/profile.jpeg"
