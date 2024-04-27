@@ -10,6 +10,13 @@ const { blogDataState } = inject(blogInjectionKey)!;
 // TODO: ! is not safe
 const { previewImageUrl } = inject(imageInjectionKey)!;
 
+type Props = {
+  isGetOgpLoading: boolean;
+  isPostBlogLoading: boolean;
+};
+
+const props = defineProps<Props>();
+
 type Emits = {
   (emit: "on-get-ogp", url: Blog["url"]): Promise<Blog | null>;
   (emit: "on-update-image", file: File): void;
@@ -17,7 +24,7 @@ type Emits = {
   (
     emit: "on-post-blog",
     blog: Pick<Blog, "url" | "title" | "description" | "image">
-  ): Promise<Blog | null>;
+  ): Promise<void>;
 };
 
 const emits = defineEmits<Emits>();
@@ -26,11 +33,11 @@ const validationSchema = toTypedSchema(
   z.object({
     url: z
       .string()
-      .min(1, "Field is required")
+      .min(1, "Url is required")
       .url({ message: "Must be a valid url" }),
-    title: z.string().min(1, "Field is required"),
-    description: z.string().min(1, "Field is required"),
-    image: z.string().min(1, "Field is required"),
+    title: z.string().min(1, "Title is required"),
+    description: z.string().min(1, "Description is required"),
+    image: z.string().min(1, "Image is required"),
   })
 );
 
@@ -46,6 +53,19 @@ const fields = {
 };
 
 const { url, title, description, image } = fields;
+
+const canGetOgp = computed(
+  () => Object.keys(errors.value).length === 0 && url.value?.value?.length > 0
+);
+
+const canSubmit = computed(
+  () =>
+    Object.keys(errors.value).length === 0 &&
+    url.value?.value?.length > 0 &&
+    title.value?.value?.length > 0 &&
+    description.value?.value?.length > 0 &&
+    image.value?.value?.length > 0
+);
 
 const onGetOgp = async () => {
   emits("on-get-ogp", url.value.value);
@@ -75,21 +95,24 @@ const onPostBlog = handleSubmit(async ({ url, title, description, image }) => {
   emits("on-post-blog", { url, title, description, image });
 });
 
-watch(blogDataState, (newState) => {
-  setFieldValue("url", newState.url);
-  setFieldValue("title", newState.title);
-  setFieldValue("description", newState.description);
-  setFieldValue("image", newState.image);
+watch(blogDataState, (newBlogsDataState) => {
+  setFieldValue("url", newBlogsDataState.url);
+  setFieldValue("title", newBlogsDataState.title);
+  setFieldValue("description", newBlogsDataState.description);
+  setFieldValue("image", newBlogsDataState.image);
 });
 </script>
 
 <template>
   <form class="flex flex-col gap-4" @submit="onPostBlog">
     <div>
-      <UInput v-model="url.value.value" placeholder="blog url" />
+      <label for="title">Url(Required)</label>
+      <UInput v-model="url.value.value" />
       <span class="block min-h-[2rem]">{{ errors.url }}</span>
     </div>
-    <UButton @click="onGetOgp">Get the blog data by the blog url</UButton>
+    <UButton @click="onGetOgp" :disabled="!canGetOgp" :loading="isGetOgpLoading"
+      >Get the data by the url</UButton
+    >
     <div>
       <label for="title">Title(Required)</label>
       <UInput id="title" v-model="title.value.value" />
@@ -123,7 +146,9 @@ watch(blogDataState, (newState) => {
       </div>
     </div>
     <div>
-      <UButton @click="onPostBlog">Post</UButton>
+      <UButton type="submit" :disabled="!canSubmit" :loading="isPostBlogLoading"
+        >Post</UButton
+      >
     </div>
   </form>
 </template>
