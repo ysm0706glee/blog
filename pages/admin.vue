@@ -17,6 +17,7 @@ provide(imageInjectionKey, _useImage);
 const { getOgp } = _useOgp;
 
 const {
+  blogDataState,
   offsetState,
   limitState,
   getBlogs,
@@ -26,11 +27,15 @@ const {
   getBlogsWithInfiniteScroll,
 } = _useBlog;
 
-const { imageUrl, previewImageUrl, temporaryImageKey, postImage, deleteImage } =
+const { previewImageUrl, temporaryImageKey, postImage, deleteImage } =
   _useImage;
+
+const isGetOgpLoading = ref(false);
+const isPostBlogLoading = ref(false);
 
 const onGetOgp = async (url: Blog["url"]) => {
   try {
+    isGetOgpLoading.value = true;
     const ogp = await getOgp(url);
     if (ogp.image !== "") {
       previewImageUrl.value = ogp.image;
@@ -39,6 +44,8 @@ const onGetOgp = async (url: Blog["url"]) => {
   } catch (error) {
     console.error(error);
     useNuxtApp().$toast.error("error");
+  } finally {
+    isGetOgpLoading.value = false;
   }
 };
 
@@ -46,12 +53,12 @@ const onUpdateImage = async (file: File) => {
   try {
     previewImageUrl.value = URL.createObjectURL(file);
     const response = await postImage(file);
-    imageUrl.value = response.url;
+    blogDataState.value = {
+      ...blogDataState.value,
+      image: response.url,
+    };
     temporaryImageKey.value = response.key;
   } catch (error) {
-    previewImageUrl.value = "";
-    imageUrl.value = "";
-    temporaryImageKey.value = "";
     console.error(error);
     useNuxtApp().$toast.error("error");
   }
@@ -61,7 +68,10 @@ const onDeleteImage = async () => {
   try {
     await deleteImage(temporaryImageKey.value);
     previewImageUrl.value = "";
-    imageUrl.value = "";
+    blogDataState.value = {
+      ...blogDataState.value,
+      image: "",
+    };
     temporaryImageKey.value = "";
   } catch (error) {
     console.error(error);
@@ -73,6 +83,7 @@ const onPostBlog = async (
   blog: Pick<Blog, "url" | "title" | "description" | "image">
 ) => {
   try {
+    isPostBlogLoading.value = true;
     setBlogData(blog.url, {
       title: blog.title,
       description: blog.description,
@@ -84,6 +95,8 @@ const onPostBlog = async (
   } catch (error) {
     console.error(error);
     useNuxtApp().$toast.error("error");
+  } finally {
+    isPostBlogLoading.value = false;
   }
 };
 
@@ -108,6 +121,8 @@ try {
 
 <template>
   <TAdmin
+    :is-get-ogp-loading="isGetOgpLoading"
+    :is-post-blog-loading="isPostBlogLoading"
     @on-get-ogp="onGetOgp"
     @on-update-image="onUpdateImage"
     @on-delete-image="onDeleteImage"

@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import type { Blog } from "@/types/blog";
 
+type Props = {
+  isGetOgpLoading: boolean;
+  isPostBlogLoading: boolean;
+};
+
+const props = defineProps<Props>();
+
 type Emits = {
   (emit: "on-get-ogp", url: Blog["url"]): Promise<Blog | null>;
   (emit: "on-update-image", file: File): void;
@@ -8,7 +15,7 @@ type Emits = {
   (
     emit: "on-post-blog",
     blog: Pick<Blog, "url" | "title" | "description" | "image">
-  ): Promise<Blog | null>;
+  ): Promise<void>;
   (emit: "on-delete-blog", blogId: Blog["id"]): Promise<void>;
 };
 
@@ -65,6 +72,8 @@ const onDeleteBlog = (blogId: Blog["id"]) => {
             @click="onCloseAddBlogModal"
           />
           <OBlogForm
+            :is-get-ogp-loading="isGetOgpLoading"
+            :is-post-blog-loading="isPostBlogLoading"
             @on-get-ogp="onGetOgp"
             @on-update-image="updateImage"
             @on-delete-image="onDeleteImage"
