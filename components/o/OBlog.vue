@@ -27,7 +27,7 @@ const handleClick = () => {
 <template>
   <div
     class="flex items-center space-x-4 cursor-pointer hover:text-gray-400"
-    :onclick="handleClick"
+    @click="handleClick"
   >
     <div class="flex-1">
       <h2 class="text-lg font-semibold">{{ blog.title }}</h2>
