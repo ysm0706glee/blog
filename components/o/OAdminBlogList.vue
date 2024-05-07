@@ -67,17 +67,19 @@ useInfiniteScroll(
       <p class="mt-4 text-lg text-gray-500">No blogs</p>
     </template>
   </div>
-  <!-- TODO: style -->
   <UModal v-model="isOpen">
-    <p>Are you sure you want to delete?</p>
-    <UButton
-      @click="
-        () => {
-          onDeleteBlog();
-          isOpen = false;
-        }
-      "
-      >delete</UButton
-    >
+    <div class="p-4 flex flex-col gap-1">
+      <p>Are you sure you want to delete?</p>
+      <UButton
+        color="red"
+        @click="
+          () => {
+            onDeleteBlog();
+            isOpen = false;
+          }
+        "
+        >delete
+      </UButton>
+    </div>
   </UModal>
 </template>
