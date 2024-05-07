@@ -69,7 +69,6 @@ export const useBlog = () => {
       setHasMoreData(false);
     }
   };
-
   const setBlogData = (
     url: Blog["url"],
     blog: Pick<Blog, "title" | "description" | "image">
