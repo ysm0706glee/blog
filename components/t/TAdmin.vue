@@ -43,10 +43,11 @@ const onDeleteImage = () => {
   emits("on-delete-image");
 };
 
-const onPostBlog = (
+const onPostBlog = async (
   blog: Pick<Blog, "url" | "title" | "description" | "image">
 ) => {
-  emits("on-post-blog", blog);
+  await emits("on-post-blog", blog);
+  onCloseAddBlogModal();
 };
 
 const onDeleteBlog = (blogId: Blog["id"]) => {

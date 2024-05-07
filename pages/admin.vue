@@ -17,6 +17,7 @@ provide(imageInjectionKey, _useImage);
 const { getOgp } = _useOgp;
 
 const {
+  blogsState,
   blogDataState,
   offsetState,
   limitState,
@@ -24,7 +25,6 @@ const {
   setBlogData,
   postBlog,
   deleteBlog,
-  getBlogsWithInfiniteScroll,
 } = _useBlog;
 
 const { previewImageUrl, temporaryImageKey, postImage, deleteImage } =
@@ -91,7 +91,10 @@ const onPostBlog = async (
     });
     await postBlog();
     useNuxtApp().$toast.success("success");
-    // TODO: close modal
+    // get new blogs after posting
+    offsetState.value = 0;
+    blogsState.value = [];
+    await getBlogs(offsetState.value, limitState.value);
   } catch (error) {
     console.error(error);
     useNuxtApp().$toast.error("error");
@@ -103,8 +106,11 @@ const onPostBlog = async (
 const onDeleteBlog = async (blogId: Blog["id"]) => {
   try {
     await deleteBlog(blogId);
-    // TODO: Implement infinite scroll
-    await getBlogsWithInfiniteScroll();
+    useNuxtApp().$toast.success("success");
+    // get new blogs after delete
+    offsetState.value = 0;
+    blogsState.value = [];
+    await getBlogs(offsetState.value, limitState.value);
   } catch (error) {
     console.error(error);
     useNuxtApp().$toast.error("error");
